@@ -22,6 +22,29 @@ body{
   color:var(--text);
 }
 
+/* RGB HAKKI GEÇENLER */
+.rgb-btn{
+  position:fixed;
+  top:14px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:10px 22px;
+  border-radius:999px;
+  font-weight:600;
+  color:white;
+  text-decoration:none;
+  z-index:100;
+  background:linear-gradient(90deg,
+    red,orange,yellow,green,cyan,blue,purple,red);
+  background-size:400%;
+  animation:rgb 6s linear infinite;
+  box-shadow:0 0 20px rgba(255,255,255,.4);
+}
+@keyframes rgb{
+  0%{background-position:0%}
+  100%{background-position:400%}
+}
+
 /* HEADER */
 header{
   min-height:100vh;
@@ -31,13 +54,8 @@ header{
   text-align:center;
   padding:20px;
 }
-h1{
-  font-size:clamp(2.2rem,6vw,3.5rem);
-}
-.scroll{
-  margin-top:20px;
-  opacity:.6;
-}
+h1{font-size:clamp(2.2rem,6vw,3.5rem)}
+.scroll{opacity:.6;margin-top:20px}
 
 /* GENEL */
 section{padding:60px 14px}
@@ -48,13 +66,10 @@ section{padding:60px 14px}
   border-radius:20px;
   border:1px solid rgba(255,255,255,.1);
 }
-.title{margin-top:0}
 .muted{color:var(--muted);line-height:1.6}
 
 /* GÖRSELLER */
-.image-box{
-  margin-top:16px;
-}
+.image-box{margin-top:16px}
 .image-box img{
   width:100%;
   border-radius:14px;
@@ -69,7 +84,7 @@ section{padding:60px 14px}
   padding:10px 14px;
   border-radius:999px;
   border:1px solid rgba(255,255,255,.2);
-  z-index:5;
+  z-index:10;
 }
 .music button{
   background:none;
@@ -92,7 +107,7 @@ section{padding:60px 14px}
   object-fit:contain;
 }
 
-/* KIRMIZI ÇARPI */
+/* ÇIKIŞ */
 .close-btn{
   position:absolute;
   top:16px;
@@ -137,18 +152,15 @@ section{padding:60px 14px}
   border-radius:10px;
   cursor:pointer;
 }
-
-/* MOBİL İNCE AYAR */
-@media(max-width:600px){
-  section{padding:40px 12px}
-  .card{padding:20px}
-}
 </style>
 </head>
 
 <body>
 
-<!-- ARKA PLAN MÜZİK -->
+<!-- RGB BUTON -->
+<a href="hakkigecenler.html" class="rgb-btn">🌈 Hakkı Geçenler</a>
+
+<!-- MÜZİK -->
 <audio id="bgm" src="GECE 3_TE AĞLAMAKTAN GÖZLERİMİ ÇIKARTAN LİSTE(__Le6S8KoS3Y_).m4a" loop></audio>
 
 <div class="music">
@@ -159,7 +171,7 @@ section{padding:60px 14px}
 <header>
   <div>
     <h1>Umut İçin Adalet</h1>
-    <p class="muted">Yaşanan haksızlığın duyulması için hazırlanmıştır</p>
+    <p class="muted">Yaşanan haksızlıkların duyulması için</p>
     <div class="scroll">⬇ Aşağı Kaydır</div>
   </div>
 </header>
@@ -168,33 +180,28 @@ section{padding:60px 14px}
 <section>
   <div class="wrap">
     <div class="card">
-      <h2 class="title">Olayın Özeti</h2>
+      <h2>Olayın Özeti</h2>
       <p class="muted">
-        Umut, Hasan adlı bir öğrenci tarafından fiziksel şiddete maruz kalmıştır.
-        Yaşanan olayın ardından yeterli inceleme yapılmadan sınıftan uzaklaştırılmıştır.
+        Umut, Hasan adlı bir öğrenci tarafından fiziksel şiddete maruz kalmış,
+        olay sonrası yeterli inceleme yapılmadan sınıftan uzaklaştırılmıştır.
       </p>
       <p class="muted">
-        Ayrıca ilgili öğretmenin Umut’a karşı önyargılı davrandığı ve
-        iftira içerikli söylemlerle durumu ağırlaştırdığı iddia edilmektedir.
-      </p>
-      <p class="muted">
-        Bu site, yaşanan haksızlığa dikkat çekmek ve kamuoyunda farkındalık
-        oluşturmak amacıyla hazırlanmıştır.
+        Bu site, Umut için adalet yolunda farkındalık oluşturmak amacıyla hazırlanmıştır.
       </p>
     </div>
   </div>
 </section>
 
 <!-- GÖRSELLER -->
-<section><div class="wrap"><div class="card"><h2 class="title">Görüntü 1</h2><div class="image-box"><img src="IMG_20251226_193225_916.jpg"></div></div></div></section>
-<section><div class="wrap"><div class="card"><h2 class="title">Görüntü 2</h2><div class="image-box"><img src="IMG_20251226_193222_224.jpg"></div></div></div></section>
-<section><div class="wrap"><div class="card"><h2 class="title">Görüntü 3</h2><div class="image-box"><img src="IMG_20251226_193139_652.jpg"></div></div></div></section>
+<section><div class="wrap"><div class="card"><h2>Görüntü 1</h2><div class="image-box"><img src="IMG_20251226_193225_916.jpg"></div></div></div></section>
+<section><div class="wrap"><div class="card"><h2>Görüntü 2</h2><div class="image-box"><img src="IMG_20251226_193222_224.jpg"></div></div></div></section>
+<section><div class="wrap"><div class="card"><h2>Görüntü 3</h2><div class="image-box"><img src="IMG_20251226_193139_652.jpg"></div></div></div></section>
 
 <!-- VİDEO -->
 <section>
   <div class="wrap">
     <div class="card">
-      <h2 class="title">Görüntü 4 (Video)</h2>
+      <h2>Görüntü 4 (Video)</h2>
       <button onclick="openWarning()">▶ Videoyu Aç</button>
     </div>
   </div>
@@ -203,9 +210,7 @@ section{padding:60px 14px}
 <!-- UYARI -->
 <div id="warning">
   <div class="box">
-    <p>
-      Videodan çıkmak için <b>sağ üstteki kırmızı ❌</b> tuşuna basabilirsin.
-    </p>
+    <p>Videodan çıkmak için sağ üstteki <b>kırmızı ❌</b> tuşuna basabilirsin.</p>
     <button onclick="openVideo()">Devam Et</button>
   </div>
 </div>
