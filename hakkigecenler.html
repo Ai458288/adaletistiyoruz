@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hakkı Geçenler</title>
+
+<style>
+:root{
+  --bg:#020617;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui;
+  background:linear-gradient(120deg,#020617,#0f172a,#020617);
+  color:var(--text);
+}
+
+/* RGB GERİ DÖN */
+.rgb-back{
+  position:fixed;
+  top:14px;
+  left:14px;
+  padding:10px 18px;
+  border-radius:999px;
+  font-weight:600;
+  color:white;
+  text-decoration:none;
+  z-index:100;
+  background:linear-gradient(90deg,purple,blue,cyan,green,yellow,orange,red,purple);
+  background-size:400%;
+  animation:rgbBack 6s linear infinite;
+  box-shadow:0 0 20px rgba(255,255,255,.4);
+}
+@keyframes rgbBack{
+  0%{background-position:0%}
+  100%{background-position:400%}
+}
+
+header{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:24px;
+}
+section{padding:60px 14px}
+.wrap{max-width:1000px;margin:auto}
+.card{
+  background:#0f172a;
+  padding:26px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.1);
+}
+.image-box img{
+  width:100%;
+  border-radius:16px;
+  margin-top:14px;
+}
+
+/* MÜZİK */
+.music{
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  padding:10px 16px;
+  border-radius:999px;
+  background:#020617;
+  border:1px solid rgba(255,255,255,.2);
+}
+.music button{
+  background:none;
+  border:none;
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<!-- GERİ DÖN -->
+<a href="index.html" class="rgb-back">⬅ Geri Dön</a>
+
+<audio id="bgm" src="ESKI_MUZIK.mp3" loop></audio>
+
+<div class="music">
+  <button onclick="bgm.play()">▶</button>
+  <button onclick="bgm.pause()">⏸</button>
+</div>
+
+<header>
+  <div>
+    <h1>Hakkı Geçenler</h1>
+    <p class="muted">
+      Hakkı geçenlere çok teşekkür ederim.  
+      Umutcan arkadaşımız için adalet yolunda yanımızda olan herkese minnettarız.
+    </p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="card">
+      <h2>Destek Olanlar</h2>
+      <div class="image-box"><img src="SS1.jpg"></div>
+      <div class="image-box"><img src="SS2.jpg"></div>
+      <div class="image-box"><img src="SS3.jpg"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+const bgm=document.getElementById("bgm");
+document.body.addEventListener("click",()=>{
+  bgm.play().catch(()=>{});
+},{once:true});
+</script>
+
+</body>
+</html>
