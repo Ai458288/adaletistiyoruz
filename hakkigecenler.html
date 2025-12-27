@@ -11,116 +11,100 @@
   --card:#0f172a;
   --text:#e5e7eb;
   --muted:#9ca3af;
+  --red:#ef4444;
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
-  font-family:system-ui;
-  background:linear-gradient(120deg,#020617,#0f172a,#020617);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
+  background:linear-gradient(120deg,#020617,#0f172a);
   color:var(--text);
-}
-
-/* RGB GERİ DÖN */
-.rgb-back{
-  position:fixed;
-  top:14px;
-  left:14px;
-  padding:10px 18px;
-  border-radius:999px;
-  font-weight:600;
-  color:white;
-  text-decoration:none;
-  z-index:100;
-  background:linear-gradient(90deg,purple,blue,cyan,green,yellow,orange,red,purple);
-  background-size:400%;
-  animation:rgbBack 6s linear infinite;
-  box-shadow:0 0 20px rgba(255,255,255,.4);
-}
-@keyframes rgbBack{
-  0%{background-position:0%}
-  100%{background-position:400%}
-}
-
-header{
   min-height:100vh;
   display:flex;
+  flex-direction:column;
   align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:24px;
-}
-section{padding:60px 14px}
-.wrap{max-width:1000px;margin:auto}
-.card{
-  background:#0f172a;
-  padding:26px;
-  border-radius:22px;
-  border:1px solid rgba(255,255,255,.1);
-}
-.image-box img{
-  width:100%;
-  border-radius:16px;
-  margin-top:14px;
 }
 
-/* MÜZİK */
-.music{
-  position:fixed;
-  right:14px;
-  bottom:14px;
-  padding:10px 16px;
-  border-radius:999px;
-  background:#020617;
-  border:1px solid rgba(255,255,255,.2);
+/* RGB BAŞLIK */
+.rgb-box{
+  margin-top:60px;
+  padding:18px 28px;
+  border-radius:20px;
+  font-size:1.6rem;
+  font-weight:700;
+  text-align:center;
+  background:
+    linear-gradient(var(--bg),var(--bg)) padding-box,
+    linear-gradient(90deg,red,orange,yellow,green,cyan,blue,purple,red) border-box;
+  border:4px solid transparent;
+  animation:rgb 6s linear infinite;
 }
-.music button{
-  background:none;
-  border:none;
+
+@keyframes rgb{
+  0%{filter:hue-rotate(0deg)}
+  100%{filter:hue-rotate(360deg)}
+}
+
+/* METİN */
+.text{
+  margin:30px 16px;
+  max-width:720px;
+  text-align:center;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+/* KIRMIZI ÇERÇEVELİ RESİM ALANI */
+.red-frame{
+  margin:20px auto;
+  max-width:320px;
+  padding:8px;
+  border:3px solid var(--red);
+  border-radius:18px;
+}
+
+.red-frame img{
+  width:100%;
+  border-radius:14px;
+}
+
+/* GERİ DÖN BUTONU */
+.back{
+  margin:40px 0;
+  padding:12px 22px;
+  border-radius:999px;
+  font-weight:600;
+  text-decoration:none;
   color:white;
+  background:
+    linear-gradient(var(--bg),var(--bg)) padding-box,
+    linear-gradient(90deg,red,orange,yellow,green,cyan,blue,purple) border-box;
+  border:3px solid transparent;
+  animation:rgb 4s linear infinite;
 }
 </style>
 </head>
 
 <body>
 
-<!-- GERİ DÖN -->
-<a href="index.html" class="rgb-back">⬅ Geri Dön</a>
-
-<audio id="bgm" src="ESKI_MUZIK.mp3" loop></audio>
-
-<div class="music">
-  <button onclick="bgm.play()">▶</button>
-  <button onclick="bgm.pause()">⏸</button>
+<div class="rgb-box">
+  Teşekkürler
 </div>
 
-<header>
-  <div>
-    <h1>Hakkı Geçenler</h1>
-    <p class="muted">
-      Hakkı geçenlere çok teşekkür ederim.  
-      Umutcan arkadaşımız için adalet yolunda yanımızda olan herkese minnettarız.
-    </p>
-  </div>
-</header>
+<div class="text">
+  Hakkı geçen herkese çok teşekkür ederim.<br>
+  Umutcan arkadaşımız için adalet yolunda yanımızda olduğunuz için minnettarız.
+</div>
 
-<section>
-  <div class="wrap">
-    <div class="card">
-      <h2>Destek Olanlar</h2>
-      <div class="image-box"><img src="IMG_20251227_113512_311.jpg"></div>
-      <div class="image-box"><img src="SS2.jpg"></div>
-      <div class="image-box"><img src="SS3.jpg"></div>
-    </div>
-  </div>
-</section>
+<div class="red-frame">
+  <img src="resim1.jpg" alt="Teşekkür Görseli">
+</div>
 
-<script>
-const bgm=document.getElementById("bgm");
-document.body.addEventListener("click",()=>{
-  bgm.play().catch(()=>{});
-},{once:true});
-</script>
+<a class="back" href="index.html">
+  ⬅ Geri Dön
+</a>
 
 </body>
 </html>
