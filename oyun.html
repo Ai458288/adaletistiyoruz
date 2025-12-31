@@ -6,51 +6,102 @@
 <title>Umut – Adalet Oyunu</title>
 
 <style>
-*{box-sizing:border-box;user-select:none;-webkit-user-select:none}
-html,body{margin:0;height:100%;overflow:hidden;background:#020617;color:#fff;font-family:Arial}
-#game{position:relative;width:100vw;height:100vh;background:radial-gradient(circle,#0f172a,#020617)}
+*{
+  box-sizing:border-box;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#020617;
+  color:#fff;
+  font-family:Arial, sans-serif;
+}
+
+#game{
+  position:relative;
+  width:100%;
+  height:100%;
+  background:radial-gradient(circle at top,#0f172a,#020617);
+}
+
+/* PLAYER */
 #player{
-  width:30px;height:30px;border-radius:50%;
-  background:#a78bfa;position:absolute;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#a78bfa;
+  position:absolute;
   box-shadow:0 0 20px #a78bfa;
 }
+
+/* TARGET */
 .target{
-  width:22px;height:22px;border-radius:50%;
-  background:#22c55e;position:absolute;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:#22c55e;
+  position:absolute;
   box-shadow:0 0 15px #22c55e;
 }
+
+/* HUD */
 #hud{
-  position:absolute;top:10px;right:10px;
-  padding:8px 14px;border-radius:999px;
+  position:absolute;
+  top:10px;
+  right:10px;
+  padding:8px 14px;
+  border-radius:999px;
   background:rgba(0,0,0,.6);
   border:1px solid #22c55e;
-  z-index:10;
+  z-index:5;
 }
+
+/* OVERLAYS */
 .overlay{
-  position:absolute;inset:0;
+  position:absolute;
+  inset:0;
   background:rgba(0,0,0,.85);
-  display:flex;flex-direction:column;
-  justify-content:center;align-items:center;
-  z-index:20;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:10;
+  text-align:center;
 }
 .hidden{display:none}
+
+/* BUTTON */
 button{
-  padding:12px 22px;border-radius:999px;
-  background:transparent;color:#fff;
-  border:1px solid #fff;
-  font-size:16px;margin:6px;
-  touch-action:manipulation;
+  padding:12px 22px;
+  margin:6px;
+  border-radius:999px;
+  background:transparent;
+  color:#fff;
+  border:2px solid #fff;
+  font-size:16px;
 }
-.rgb{border:2px solid;animation:rgb 3s linear infinite}
+.rgb{
+  animation:rgb 3s linear infinite;
+}
 @keyframes rgb{
   0%{border-color:red}
   33%{border-color:lime}
   66%{border-color:cyan}
   100%{border-color:red}
 }
+
+/* CONTROLS */
 .controls{
-  position:absolute;bottom:20px;width:100%;
-  display:flex;justify-content:space-between;
+  position:absolute;
+  bottom:20px;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
   padding:0 20px;
 }
 .pad{
@@ -62,12 +113,20 @@ button{
 .btn{
   background:rgba(255,255,255,.15);
   border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-size:26px;
 }
+
+/* JOYSTICK */
 #joyZone{
-  position:absolute;bottom:0;left:0;right:0;
-  height:140px;background:rgba(255,0,0,.15);
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:160px;
+  background:rgba(255,0,0,.15);
   display:none;
 }
 </style>
@@ -75,27 +134,32 @@ button{
 <body>
 
 <div id="game">
-  <div id="hud" class="hidden">Hedef: 0 / 0</div>
+
+  <div id="hud">Hedef: 0 / 0</div>
   <div id="player"></div>
 
+  <!-- BAŞLANGIÇ -->
   <div class="overlay" id="start">
     <h2>Oyun Karardı</h2>
     <p>Kaç hedef toplansın?</p>
-    <input id="goalInput" type="number" value="5" min="3" max="20">
+    <input id="goalInput" type="number" value="5" min="3" max="30">
     <button class="rgb" onclick="startGame()">Başla</button>
   </div>
 
+  <!-- BİTİŞ -->
   <div class="overlay hidden" id="win">
-    <video src="kazanan.mp4" autoplay muted loop></video>
+    <!-- video veya gif -->
+    <video src="kazanan.mp4" autoplay muted loop style="width:200px;height:200px;border-radius:20px"></video>
     <h2>Tebrikler!</h2>
     <button onclick="location.reload()">Tekrar Başla</button>
   </div>
 
-  <div style="position:absolute;top:10px;left:10px;z-index:10">
-    <button onclick="toggleLayout()" style="border-color:red">Yakınlaş</button><br>
+  <!-- ÜST BUTONLAR -->
+  <div style="position:absolute;top:10px;left:10px;z-index:5">
     <button onclick="toggleJoy()">Joystick</button>
   </div>
 
+  <!-- TUŞLAR -->
   <div class="controls" id="controls">
     <div class="pad">
       <div></div>
@@ -126,29 +190,22 @@ button{
 const game=document.getElementById("game");
 const player=document.getElementById("player");
 const hud=document.getElementById("hud");
+const joyZone=document.getElementById("joyZone");
+const controls=document.getElementById("controls");
 
 let px=innerWidth/2, py=innerHeight/2;
-let targets=[], goal=5, collected=0;
+let vx=0, vy=0;
+let targets=[];
+let goal=5, collected=0;
 let active=false;
+let joy=false;
 
+/* PLAYER INIT */
 player.style.left=px+"px";
 player.style.top=py+"px";
 
-function updateHUD(){
-  hud.textContent=`Hedef: ${collected} / ${goal}`;
-}
-
-function move(dx,dy){
-  if(!active) return;
-  px=Math.max(0,Math.min(innerWidth-30,px+dx));
-  py=Math.max(0,Math.min(innerHeight-30,py+dy));
-  player.style.left=px+"px";
-  player.style.top=py+"px";
-  checkCollision();
-}
-
+/* SPAWN */
 function spawnTarget(){
-  if(targets.length>=Math.ceil(goal/2)) return;
   const t=document.createElement("div");
   t.className="target";
   t.style.left=Math.random()*(innerWidth-30)+"px";
@@ -157,58 +214,100 @@ function spawnTarget(){
   targets.push(t);
 }
 
-function checkCollision(){
-  const pr=player.getBoundingClientRect();
-  const pcx=pr.left+pr.width/2;
-  const pcy=pr.top+pr.height/2;
-
-  targets=targets.filter(t=>{
-    const tr=t.getBoundingClientRect();
-    const tcx=tr.left+tr.width/2;
-    const tcy=tr.top+tr.height/2;
-
-    if(Math.hypot(pcx-tcx,pcy-tcy)<25){
-      t.remove();
-      collected++;
-      updateHUD();
-      if(collected>=goal){
-        active=false;
-        document.getElementById("win").classList.remove("hidden");
-      }else{
-        spawnTarget();
-      }
-      return false;
-    }
-    return true;
-  });
-}
-
+/* GAME START */
 function startGame(){
   goal=+goalInput.value;
   collected=0;
   targets.forEach(t=>t.remove());
   targets=[];
-  hud.classList.remove("hidden");
-  updateHUD();
+  for(let i=0;i<Math.ceil(goal/2);i++) spawnTarget();
+  hud.textContent=`Hedef: 0 / ${goal}`;
   document.getElementById("start").classList.add("hidden");
   active=true;
-  for(let i=0;i<Math.ceil(goal/2);i++) spawnTarget();
 }
 
+/* GAME LOOP */
+function loop(){
+  if(active){
+    px+=vx;
+    py+=vy;
+
+    px=Math.max(0,Math.min(innerWidth-32,px));
+    py=Math.max(0,Math.min(innerHeight-32,py));
+
+    player.style.left=px+"px";
+    player.style.top=py+"px";
+
+    const pr=player.getBoundingClientRect();
+    const pcx=pr.left+pr.width/2;
+    const pcy=pr.top+pr.height/2;
+
+    targets=targets.filter(t=>{
+      const tr=t.getBoundingClientRect();
+      const tcx=tr.left+tr.width/2;
+      const tcy=tr.top+tr.height/2;
+
+      if(Math.hypot(pcx-tcx,pcy-tcy)<26){
+        t.remove();
+        collected++;
+        hud.textContent=`Hedef: ${collected} / ${goal}`;
+        if(collected>=goal){
+          active=false;
+          document.getElementById("win").classList.remove("hidden");
+        }else{
+          spawnTarget();
+        }
+        return false;
+      }
+      return true;
+    });
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* BUTTON CONTROLS */
 document.querySelectorAll(".btn").forEach(b=>{
-  const a=b.getAttribute("data");
+  const a=b.dataset.action || b.getAttribute("data");
   ["touchstart","mousedown"].forEach(ev=>{
     b.addEventListener(ev,e=>{
       e.preventDefault();
-      if(a=="left")move(-20,0);
-      if(a=="right")move(20,0);
-      if(a=="up")move(0,-20);
-      if(a=="down")move(0,20);
-      if(a=="back")move(-40,0);
-      if(a=="forward")move(40,0);
+      if(!active) return;
+      if(a=="left") vx=-4;
+      if(a=="right") vx=4;
+      if(a=="up") vy=-4;
+      if(a=="down") vy=4;
+      if(a=="back") vx=-7;
+      if(a=="forward") vx=7;
     });
   });
+  ["touchend","mouseup","mouseleave"].forEach(ev=>{
+    b.addEventListener(ev,()=>{vx=0;vy=0;});
+  });
 });
+
+/* JOYSTICK */
+let sx=0, sy=0;
+joyZone.addEventListener("touchstart",e=>{
+  sx=e.touches[0].clientX;
+  sy=e.touches[0].clientY;
+});
+joyZone.addEventListener("touchmove",e=>{
+  const dx=e.touches[0].clientX-sx;
+  const dy=e.touches[0].clientY-sy;
+  vx=dx*0.05;
+  vy=dy*0.05;
+});
+joyZone.addEventListener("touchend",()=>{
+  vx=0;vy=0;
+});
+
+/* TOGGLE JOY */
+function toggleJoy(){
+  joy=!joy;
+  joyZone.style.display=joy?"block":"none";
+  controls.style.display=joy?"none":"flex";
+}
 </script>
 
 </body>
