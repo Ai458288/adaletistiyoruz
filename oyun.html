@@ -2,313 +2,278 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Umut – Adalet Oyunu</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Umut İçin Adalet - Oyun</title>
 
 <style>
 *{
   box-sizing:border-box;
   user-select:none;
   -webkit-user-select:none;
-  touch-action:none;
+  -webkit-touch-callout:none;
 }
-html,body{
+
+body{
   margin:0;
-  width:100%;
-  height:100%;
   overflow:hidden;
   background:#020617;
-  color:#fff;
-  font-family:Arial, sans-serif;
+  font-family:system-ui;
+  touch-action:none;
 }
 
 #game{
   position:relative;
-  width:100%;
-  height:100%;
-  background:radial-gradient(circle at top,#0f172a,#020617);
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
 }
 
 /* PLAYER */
 #player{
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  background:#a78bfa;
   position:absolute;
-  box-shadow:0 0 20px #a78bfa;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:#22c55e;
+  z-index:10;
 }
 
 /* TARGET */
 .target{
-  width:22px;
-  height:22px;
+  position:absolute;
+  width:28px;
+  height:28px;
   border-radius:50%;
-  background:#22c55e;
-  position:absolute;
-  box-shadow:0 0 15px #22c55e;
+  background:#ef4444;
+  z-index:9;
 }
 
-/* HUD */
-#hud{
-  position:absolute;
-  top:10px;
-  right:10px;
-  padding:8px 14px;
-  border-radius:999px;
-  background:rgba(0,0,0,.6);
-  border:1px solid #22c55e;
-  z-index:5;
-}
-
-/* OVERLAYS */
+/* OVERLAY */
 .overlay{
   position:absolute;
   inset:0;
-  background:rgba(0,0,0,.85);
+  background:rgba(0,0,0,.8);
+  z-index:50;
   display:flex;
-  flex-direction:column;
-  justify-content:center;
   align-items:center;
-  z-index:10;
+  justify-content:center;
   text-align:center;
+  color:#fff;
 }
-.hidden{display:none}
+
+.box{
+  background:#0f172a;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 0 40px rgba(168,85,247,.6);
+}
 
 /* BUTTON */
-button{
-  padding:12px 22px;
-  margin:6px;
-  border-radius:999px;
-  background:transparent;
+.btn{
+  margin-top:12px;
+  padding:10px 18px;
+  border-radius:12px;
+  background:linear-gradient(90deg,#a855f7,#ec4899,#22c55e);
+  border:none;
   color:#fff;
-  border:2px solid #fff;
   font-size:16px;
 }
-.rgb{
-  animation:rgb 3s linear infinite;
-}
-@keyframes rgb{
-  0%{border-color:red}
-  33%{border-color:lime}
-  66%{border-color:cyan}
-  100%{border-color:red}
+
+/* UI */
+#ui{
+  position:absolute;
+  top:10px;
+  left:10px;
+  color:#fff;
+  z-index:20;
 }
 
 /* CONTROLS */
 .controls{
   position:absolute;
-  bottom:20px;
+  bottom:15px;
   width:100%;
   display:flex;
   justify-content:space-between;
-  padding:0 20px;
+  padding:0 15px;
+  z-index:20;
 }
+
 .pad{
   display:grid;
-  grid-template-columns:repeat(3,60px);
-  grid-template-rows:repeat(3,60px);
-  gap:10px;
+  grid-template-columns:50px 50px 50px;
+  grid-template-rows:50px 50px 50px;
+  gap:6px;
 }
-.btn{
+
+.key{
   background:rgba(255,255,255,.15);
-  border-radius:50%;
+  border-radius:12px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:26px;
+  font-size:22px;
+}
+
+.key:active{
+  background:rgba(255,255,255,.3);
 }
 
 /* JOYSTICK */
-#joyZone{
+#joyArea{
   position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:160px;
   height:160px;
   background:rgba(255,0,0,.15);
+  border-radius:50%;
   display:none;
+  z-index:20;
+}
+
+#joy{
+  position:absolute;
+  width:50px;
+  height:50px;
+  background:#ef4444;
+  border-radius:50%;
+  top:55px;
+  left:55px;
 }
 </style>
 </head>
-<body>
 
+<body>
 <div id="game">
 
-  <div id="hud">Hedef: 0 / 0</div>
-  <div id="player"></div>
+<div id="player"></div>
 
-  <!-- BAŞLANGIÇ -->
-  <div class="overlay" id="start">
-    <h2>Oyun Karardı</h2>
-    <p>Kaç hedef toplansın?</p>
-    <input id="goalInput" type="number" value="5" min="3" max="30">
-    <button class="rgb" onclick="startGame()">Başla</button>
+<div id="ui">🎯 Hedef: <span id="left">0</span></div>
+
+<div class="controls" id="buttons">
+  <div class="pad">
+    <div></div>
+    <div class="key" data-dy="-1">⬆️</div>
+    <div></div>
+    <div class="key" data-dx="-1">⬅️</div>
+    <div></div>
+    <div class="key" data-dx="1">➡️</div>
+    <div></div>
+    <div class="key" data-dy="1">⬇️</div>
+    <div></div>
   </div>
+</div>
 
-  <!-- BİTİŞ -->
-  <div class="overlay hidden" id="win">
-    <!-- video veya gif -->
-    <video src="kazanan.mp4" autoplay muted loop style="width:200px;height:200px;border-radius:20px"></video>
+<div id="joyArea">
+  <div id="joy"></div>
+</div>
+
+<div class="overlay" id="start">
+  <div class="box">
+    <h2>🎮 Oyun Başlasın</h2>
+    <p>Kaç hedef?</p>
+    <input id="count" type="number" value="5" min="1">
+    <br>
+    <button class="btn" onclick="start()">Başla</button>
+  </div>
+</div>
+
+<div class="overlay" id="win" style="display:none">
+  <div class="box">
+    <video src="SENIN_VIDEO.mp4" autoplay loop muted style="width:200px;border-radius:12px"></video>
     <h2>Tebrikler!</h2>
-    <button onclick="location.reload()">Tekrar Başla</button>
+    <button class="btn" onclick="location.reload()">Tekrar Başla</button>
   </div>
+</div>
 
-  <!-- ÜST BUTONLAR -->
-  <div style="position:absolute;top:10px;left:10px;z-index:5">
-    <button onclick="toggleJoy()">Joystick</button>
-  </div>
-
-  <!-- TUŞLAR -->
-  <div class="controls" id="controls">
-    <div class="pad">
-      <div></div>
-      <div class="btn" data="up">⬆️</div>
-      <div></div>
-      <div class="btn" data="left">⬅️</div>
-      <div></div>
-      <div class="btn" data="right">➡️</div>
-      <div></div>
-      <div class="btn" data="down">⬇️</div>
-      <div></div>
-    </div>
-
-    <div class="pad">
-      <div></div>
-      <div class="btn" data="forward">⏩</div>
-      <div></div>
-      <div></div>
-      <div class="btn" data="back">⏪</div>
-      <div></div>
-    </div>
-  </div>
-
-  <div id="joyZone"></div>
 </div>
 
 <script>
 const game=document.getElementById("game");
 const player=document.getElementById("player");
-const hud=document.getElementById("hud");
-const joyZone=document.getElementById("joyZone");
-const controls=document.getElementById("controls");
+const joyArea=document.getElementById("joyArea");
+const joy=document.getElementById("joy");
+const leftEl=document.getElementById("left");
 
-let px=innerWidth/2, py=innerHeight/2;
-let vx=0, vy=0;
+let px=100,py=100;
+let speedX=0,speedY=0;
 let targets=[];
-let goal=5, collected=0;
-let active=false;
-let joy=false;
+let total=0;
 
-/* PLAYER INIT */
-player.style.left=px+"px";
-player.style.top=py+"px";
+function start(){
+  document.getElementById("start").style.display="none";
+  total=parseInt(document.getElementById("count").value);
+  leftEl.textContent=total;
+  spawnBatch();
+  requestAnimationFrame(loop);
+}
 
-/* SPAWN */
-function spawnTarget(){
+function spawn(){
   const t=document.createElement("div");
   t.className="target";
-  t.style.left=Math.random()*(innerWidth-30)+"px";
-  t.style.top=Math.random()*(innerHeight-30)+"px";
+  t.x=Math.random()*(innerWidth-30);
+  t.y=Math.random()*(innerHeight-30);
+  t.style.left=t.x+"px";
+  t.style.top=t.y+"px";
   game.appendChild(t);
   targets.push(t);
 }
 
-/* GAME START */
-function startGame(){
-  goal=+goalInput.value;
-  collected=0;
-  targets.forEach(t=>t.remove());
-  targets=[];
-  for(let i=0;i<Math.ceil(goal/2);i++) spawnTarget();
-  hud.textContent=`Hedef: 0 / ${goal}`;
-  document.getElementById("start").classList.add("hidden");
-  active=true;
+function spawnBatch(){
+  while(targets.length<Math.min(3,total)){
+    spawn();
+  }
 }
 
-/* GAME LOOP */
 function loop(){
-  if(active){
-    px+=vx;
-    py+=vy;
+  px+=speedX;
+  py+=speedY;
+  px=Math.max(0,Math.min(innerWidth-40,px));
+  py=Math.max(0,Math.min(innerHeight-40,py));
+  player.style.left=px+"px";
+  player.style.top=py+"px";
 
-    px=Math.max(0,Math.min(innerWidth-32,px));
-    py=Math.max(0,Math.min(innerHeight-32,py));
-
-    player.style.left=px+"px";
-    player.style.top=py+"px";
-
-    const pr=player.getBoundingClientRect();
-    const pcx=pr.left+pr.width/2;
-    const pcy=pr.top+pr.height/2;
-
-    targets=targets.filter(t=>{
-      const tr=t.getBoundingClientRect();
-      const tcx=tr.left+tr.width/2;
-      const tcy=tr.top+tr.height/2;
-
-      if(Math.hypot(pcx-tcx,pcy-tcy)<26){
-        t.remove();
-        collected++;
-        hud.textContent=`Hedef: ${collected} / ${goal}`;
-        if(collected>=goal){
-          active=false;
-          document.getElementById("win").classList.remove("hidden");
-        }else{
-          spawnTarget();
-        }
-        return false;
+  targets.forEach((t,i)=>{
+    if(Math.abs(px-t.x)<30 && Math.abs(py-t.y)<30){
+      t.remove();
+      targets.splice(i,1);
+      total--;
+      leftEl.textContent=total;
+      spawnBatch();
+      if(total<=0){
+        document.getElementById("win").style.display="flex";
       }
-      return true;
-    });
-  }
+    }
+  });
+
   requestAnimationFrame(loop);
 }
-loop();
 
 /* BUTTON CONTROLS */
-document.querySelectorAll(".btn").forEach(b=>{
-  const a=b.dataset.action || b.getAttribute("data");
-  ["touchstart","mousedown"].forEach(ev=>{
-    b.addEventListener(ev,e=>{
-      e.preventDefault();
-      if(!active) return;
-      if(a=="left") vx=-4;
-      if(a=="right") vx=4;
-      if(a=="up") vy=-4;
-      if(a=="down") vy=4;
-      if(a=="back") vx=-7;
-      if(a=="forward") vx=7;
-    });
+document.querySelectorAll(".key").forEach(k=>{
+  k.addEventListener("touchstart",()=>{
+    speedX=(k.dataset.dx||0)*4;
+    speedY=(k.dataset.dy||0)*4;
   });
-  ["touchend","mouseup","mouseleave"].forEach(ev=>{
-    b.addEventListener(ev,()=>{vx=0;vy=0;});
+  k.addEventListener("touchend",()=>{
+    speedX=speedY=0;
   });
 });
 
 /* JOYSTICK */
-let sx=0, sy=0;
-joyZone.addEventListener("touchstart",e=>{
-  sx=e.touches[0].clientX;
-  sy=e.touches[0].clientY;
+joyArea.addEventListener("touchmove",e=>{
+  const r=joyArea.getBoundingClientRect();
+  const t=e.touches[0];
+  const dx=t.clientX-(r.left+r.width/2);
+  const dy=t.clientY-(r.top+r.height/2);
+  speedX=dx/25;
+  speedY=dy/25;
 });
-joyZone.addEventListener("touchmove",e=>{
-  const dx=e.touches[0].clientX-sx;
-  const dy=e.touches[0].clientY-sy;
-  vx=dx*0.05;
-  vy=dy*0.05;
+joyArea.addEventListener("touchend",()=>{
+  speedX=speedY=0;
 });
-joyZone.addEventListener("touchend",()=>{
-  vx=0;vy=0;
-});
-
-/* TOGGLE JOY */
-function toggleJoy(){
-  joy=!joy;
-  joyZone.style.display=joy?"block":"none";
-  controls.style.display=joy?"none":"flex";
-}
 </script>
-
 </body>
 </html>
