@@ -28,7 +28,6 @@ body{
   overflow:hidden;
 }
 
-/* PLAYER */
 #player{
   position:absolute;
   width:40px;
@@ -38,7 +37,6 @@ body{
   z-index:10;
 }
 
-/* TARGET */
 .target{
   position:absolute;
   width:28px;
@@ -48,11 +46,10 @@ body{
   z-index:9;
 }
 
-/* OVERLAY */
 .overlay{
   position:absolute;
   inset:0;
-  background:rgba(0,0,0,.8);
+  background:rgba(0,0,0,.85);
   z-index:50;
   display:flex;
   align-items:center;
@@ -68,7 +65,6 @@ body{
   box-shadow:0 0 40px rgba(168,85,247,.6);
 }
 
-/* BUTTON */
 .btn{
   margin-top:12px;
   padding:10px 18px;
@@ -79,7 +75,6 @@ body{
   font-size:16px;
 }
 
-/* UI */
 #ui{
   position:absolute;
   top:10px;
@@ -95,31 +90,44 @@ body{
   width:100%;
   display:flex;
   justify-content:space-between;
-  padding:0 15px;
+  padding:0 20px;
   z-index:20;
 }
 
-.pad{
-  display:grid;
-  grid-template-columns:50px 50px 50px;
-  grid-template-rows:50px 50px 50px;
-  gap:6px;
+.stack{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.row{
+  display:flex;
+  gap:8px;
 }
 
 .key{
+  width:54px;
+  height:54px;
   background:rgba(255,255,255,.15);
-  border-radius:12px;
+  border-radius:14px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
+  font-size:24px;
 }
 
 .key:active{
-  background:rgba(255,255,255,.3);
+  background:rgba(255,255,255,.35);
 }
 
 /* JOYSTICK */
+#joyToggle{
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:25;
+}
+
 #joyArea{
   position:absolute;
   bottom:20px;
@@ -152,18 +160,22 @@ body{
 
 <div id="ui">🎯 Hedef: <span id="left">0</span></div>
 
+<button id="joyToggle" class="btn">🕹️ Joystick</button>
+
 <div class="controls" id="buttons">
-  <div class="pad">
-    <div></div>
+
+  <!-- SOL ALT: İLERİ / GERİ -->
+  <div class="stack">
     <div class="key" data-dy="-1">⬆️</div>
-    <div></div>
-    <div class="key" data-dx="-1">⬅️</div>
-    <div></div>
-    <div class="key" data-dx="1">➡️</div>
-    <div></div>
     <div class="key" data-dy="1">⬇️</div>
-    <div></div>
   </div>
+
+  <!-- SAĞ ALT: SAĞ / SOL -->
+  <div class="row">
+    <div class="key" data-dx="-1">⬅️</div>
+    <div class="key" data-dx="1">➡️</div>
+  </div>
+
 </div>
 
 <div id="joyArea">
@@ -194,7 +206,8 @@ body{
 const game=document.getElementById("game");
 const player=document.getElementById("player");
 const joyArea=document.getElementById("joyArea");
-const joy=document.getElementById("joy");
+const joyToggle=document.getElementById("joyToggle");
+const buttons=document.getElementById("buttons");
 const leftEl=document.getElementById("left");
 
 let px=100,py=100;
@@ -251,7 +264,7 @@ function loop(){
   requestAnimationFrame(loop);
 }
 
-/* BUTTON CONTROLS */
+/* BUTTONS */
 document.querySelectorAll(".key").forEach(k=>{
   k.addEventListener("touchstart",()=>{
     speedX=(k.dataset.dx||0)*4;
@@ -262,18 +275,24 @@ document.querySelectorAll(".key").forEach(k=>{
   });
 });
 
-/* JOYSTICK */
+/* JOYSTICK TOGGLE */
+joyToggle.onclick=()=>{
+  if(joyArea.style.display==="block"){
+    joyArea.style.display="none";
+    buttons.style.display="flex";
+  }else{
+    joyArea.style.display="block";
+    buttons.style.display="none";
+  }
+};
+
 joyArea.addEventListener("touchmove",e=>{
   const r=joyArea.getBoundingClientRect();
   const t=e.touches[0];
-  const dx=t.clientX-(r.left+r.width/2);
-  const dy=t.clientY-(r.top+r.height/2);
-  speedX=dx/25;
-  speedY=dy/25;
+  speedX=(t.clientX-(r.left+r.width/2))/25;
+  speedY=(t.clientY-(r.top+r.height/2))/25;
 });
-joyArea.addEventListener("touchend",()=>{
-  speedX=speedY=0;
-});
+joyArea.addEventListener("touchend",()=>speedX=speedY=0);
 </script>
 </body>
 </html>
