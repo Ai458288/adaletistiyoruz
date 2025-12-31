@@ -19,8 +19,7 @@ html,body{
 #player{
   width:30px;height:30px;
   background:#a78bfa;border-radius:50%;
-  position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);
+  position:absolute;
   box-shadow:0 0 20px #a78bfa;
 }
 .target{
@@ -29,6 +28,18 @@ html,body{
   position:absolute;
   box-shadow:0 0 15px #22c55e;
 }
+
+/* HUD */
+#hud{
+  position:absolute;top:10px;right:10px;
+  padding:8px 14px;
+  border-radius:999px;
+  background:rgba(0,0,0,.5);
+  border:1px solid #22c55e;
+  z-index:10;
+}
+
+/* OVERLAY */
 .overlay{
   position:absolute;inset:0;
   background:rgba(0,0,0,.85);
@@ -37,6 +48,7 @@ html,body{
   z-index:20;text-align:center;
 }
 .hidden{display:none}
+
 button{
   padding:12px 22px;
   border-radius:999px;
@@ -56,14 +68,15 @@ button{
   100%{border-color:red}
 }
 
-/* TUŞLAR */
+/* CONTROLS */
 .controls{
   position:absolute;bottom:20px;width:100%;
   display:flex;justify-content:space-between;
   padding:0 20px;
 }
 .pad{
-  display:grid;grid-template-columns:repeat(3,60px);
+  display:grid;
+  grid-template-columns:repeat(3,60px);
   grid-template-rows:repeat(3,60px);
   gap:10px;
 }
@@ -80,18 +93,12 @@ button{
   height:140px;background:rgba(255,0,0,.15);
   display:none;
 }
-
-/* BİTİŞ */
-#win video,#win img{
-  width:200px;height:200px;
-  object-fit:cover;border-radius:20px;
-  margin-bottom:10px;
-}
 </style>
 </head>
 <body>
 
 <div id="game">
+  <div id="hud" class="hidden">Hedef: 0 / 0</div>
   <div id="player"></div>
 
   <!-- BAŞLANGIÇ -->
@@ -104,10 +111,7 @@ button{
 
   <!-- BİTİŞ -->
   <div class="overlay hidden" id="win">
-    <!-- BURAYA KENDİN EKLEYEBİLİRSİN -->
     <video src="kazanan.mp4" autoplay muted loop></video>
-    <!-- veya -->
-    <!-- <img src="kazanan.gif"> -->
     <h2>Tebrikler!</h2>
     <button onclick="location.reload()">Tekrar Başla</button>
   </div>
@@ -146,36 +150,64 @@ button{
 </div>
 
 <script>
+const game=document.getElementById("game");
 const player=document.getElementById("player");
-let x=innerWidth/2,y=innerHeight/2;
-let targets=[],goal=5,collected=0,active=false;
-let near=false,joy=false;
+const hud=document.getElementById("hud");
 
-function move(dx,dy){
-  x=Math.max(0,Math.min(innerWidth-30,x+dx));
-  y=Math.max(0,Math.min(innerHeight-30,y+dy));
-  player.style.left=x+"px";
-  player.style.top=y+"px";
-  check();
+let px=innerWidth/2, py=innerHeight/2;
+let targets=[], goal=5, collected=0;
+let active=false, near=false, joy=false;
+
+player.style.left=px+"px";
+player.style.top=py+"px";
+
+function updateHUD(){
+  hud.textContent=`Hedef: ${collected} / ${goal}`;
 }
 
-function spawn(){
-  if(targets.length>=Math.ceil(goal/2))return;
+function move(dx,dy){
+  if(!active)return;
+  px=Math.max(0,Math.min(innerWidth-30,px+dx));
+  py=Math.max(0,Math.min(innerHeight-30,py+dy));
+  player.style.left=px+"px";
+  player.style.top=py+"px";
+  checkCollisions();
+}
+
+function spawnTarget(){
+  if(targets.length>=Math.ceil(goal/2)) return;
+
   const t=document.createElement("div");
   t.className="target";
-  t.style.left=Math.random()*(innerWidth-40)+"px";
-  t.style.top=Math.random()*(innerHeight-40)+"px";
+
+  const tx=Math.random()*(innerWidth-40);
+  const ty=Math.random()*(innerHeight-40);
+
+  t.style.left=tx+"px";
+  t.style.top=ty+"px";
+  t.dataset.x=tx;
+  t.dataset.y=ty;
+
   game.appendChild(t);
   targets.push(t);
 }
 
-function check(){
+function checkCollisions(){
   targets=targets.filter(t=>{
-    const r=t.getBoundingClientRect();
-    if(Math.abs(r.left-x)<25 && Math.abs(r.top-y)<25){
-      t.remove();collected++;
-      if(collected>=goal)win();
-      spawn();
+    const tx=+t.dataset.x;
+    const ty=+t.dataset.y;
+    const dist=Math.hypot(px-tx, py-ty);
+
+    if(dist<30){
+      t.remove();
+      collected++;
+      updateHUD();
+
+      if(collected>=goal){
+        endGame();
+      }else{
+        spawnTarget();
+      }
       return false;
     }
     return true;
@@ -184,22 +216,27 @@ function check(){
 
 function startGame(){
   goal=+goalInput.value;
-  document.getElementById("start").classList.add("hidden");
+  collected=0;
   active=true;
-  for(let i=0;i<Math.ceil(goal/2);i++)spawn();
+  hud.classList.remove("hidden");
+  updateHUD();
+  document.getElementById("start").classList.add("hidden");
+
+  for(let i=0;i<Math.ceil(goal/2);i++) spawnTarget();
 }
 
-function win(){
+function endGame(){
   active=false;
+  hud.classList.add("hidden");
   document.getElementById("win").classList.remove("hidden");
 }
 
+/* BUTTONS */
 document.querySelectorAll(".btn").forEach(b=>{
   const a=b.getAttribute("data");
-  ["touchstart","mousedown"].forEach(e=>{
-    b.addEventListener(e,x=>{
-      x.preventDefault();
-      if(!active)return;
+  ["touchstart","mousedown"].forEach(ev=>{
+    b.addEventListener(ev,e=>{
+      e.preventDefault();
       if(a=="left")move(-20,0);
       if(a=="right")move(20,0);
       if(a=="up")move(0,-20);
@@ -210,19 +247,21 @@ document.querySelectorAll(".btn").forEach(b=>{
   });
 });
 
+/* LAYOUT */
 function toggleLayout(){
   near=!near;
   controls.style.justifyContent=near?"center":"space-between";
   event.target.textContent=near?"Uzaklaş":"Yakınlaş";
 }
 
+/* JOYSTICK */
 function toggleJoy(){
   joy=!joy;
   joyZone.style.display=joy?"block":"none";
   controls.style.display=joy?"none":"flex";
 }
 
-let sx,sy;
+let sx=0, sy=0;
 joyZone.addEventListener("touchstart",e=>{
   sx=e.touches[0].clientX;
   sy=e.touches[0].clientY;
