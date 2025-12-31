@@ -7,68 +7,47 @@
 
 <style>
 *{box-sizing:border-box;user-select:none;-webkit-user-select:none}
-html,body{
-  margin:0;height:100%;overflow:hidden;
-  background:#020617;color:#fff;font-family:Arial;
-}
-#game{
-  position:relative;
-  width:100vw;height:100vh;
-  background:radial-gradient(circle,#0f172a,#020617);
-}
+html,body{margin:0;height:100%;overflow:hidden;background:#020617;color:#fff;font-family:Arial}
+#game{position:relative;width:100vw;height:100vh;background:radial-gradient(circle,#0f172a,#020617)}
 #player{
-  width:30px;height:30px;
-  background:#a78bfa;border-radius:50%;
-  position:absolute;
+  width:30px;height:30px;border-radius:50%;
+  background:#a78bfa;position:absolute;
   box-shadow:0 0 20px #a78bfa;
 }
 .target{
-  width:20px;height:20px;
-  background:#22c55e;border-radius:50%;
-  position:absolute;
+  width:22px;height:22px;border-radius:50%;
+  background:#22c55e;position:absolute;
   box-shadow:0 0 15px #22c55e;
 }
-
-/* HUD */
 #hud{
   position:absolute;top:10px;right:10px;
-  padding:8px 14px;
-  border-radius:999px;
-  background:rgba(0,0,0,.5);
+  padding:8px 14px;border-radius:999px;
+  background:rgba(0,0,0,.6);
   border:1px solid #22c55e;
   z-index:10;
 }
-
-/* OVERLAY */
 .overlay{
   position:absolute;inset:0;
   background:rgba(0,0,0,.85);
   display:flex;flex-direction:column;
   justify-content:center;align-items:center;
-  z-index:20;text-align:center;
+  z-index:20;
 }
 .hidden{display:none}
-
 button{
-  padding:12px 22px;
-  border-radius:999px;
-  border:1px solid #fff;
+  padding:12px 22px;border-radius:999px;
   background:transparent;color:#fff;
+  border:1px solid #fff;
   font-size:16px;margin:6px;
   touch-action:manipulation;
 }
-.rgb{
-  border:2px solid;
-  animation:rgb 3s linear infinite;
-}
+.rgb{border:2px solid;animation:rgb 3s linear infinite}
 @keyframes rgb{
   0%{border-color:red}
   33%{border-color:lime}
   66%{border-color:cyan}
   100%{border-color:red}
 }
-
-/* CONTROLS */
 .controls{
   position:absolute;bottom:20px;width:100%;
   display:flex;justify-content:space-between;
@@ -86,8 +65,6 @@ button{
   display:flex;align-items:center;justify-content:center;
   font-size:26px;
 }
-
-/* JOYSTICK */
 #joyZone{
   position:absolute;bottom:0;left:0;right:0;
   height:140px;background:rgba(255,0,0,.15);
@@ -101,7 +78,6 @@ button{
   <div id="hud" class="hidden">Hedef: 0 / 0</div>
   <div id="player"></div>
 
-  <!-- BAŞLANGIÇ -->
   <div class="overlay" id="start">
     <h2>Oyun Karardı</h2>
     <p>Kaç hedef toplansın?</p>
@@ -109,20 +85,17 @@ button{
     <button class="rgb" onclick="startGame()">Başla</button>
   </div>
 
-  <!-- BİTİŞ -->
   <div class="overlay hidden" id="win">
     <video src="kazanan.mp4" autoplay muted loop></video>
     <h2>Tebrikler!</h2>
     <button onclick="location.reload()">Tekrar Başla</button>
   </div>
 
-  <!-- ÜST TUŞLAR -->
   <div style="position:absolute;top:10px;left:10px;z-index:10">
     <button onclick="toggleLayout()" style="border-color:red">Yakınlaş</button><br>
     <button onclick="toggleJoy()">Joystick</button>
   </div>
 
-  <!-- TUŞLAR -->
   <div class="controls" id="controls">
     <div class="pad">
       <div></div>
@@ -156,7 +129,7 @@ const hud=document.getElementById("hud");
 
 let px=innerWidth/2, py=innerHeight/2;
 let targets=[], goal=5, collected=0;
-let active=false, near=false, joy=false;
+let active=false;
 
 player.style.left=px+"px";
 player.style.top=py+"px";
@@ -166,45 +139,41 @@ function updateHUD(){
 }
 
 function move(dx,dy){
-  if(!active)return;
+  if(!active) return;
   px=Math.max(0,Math.min(innerWidth-30,px+dx));
   py=Math.max(0,Math.min(innerHeight-30,py+dy));
   player.style.left=px+"px";
   player.style.top=py+"px";
-  checkCollisions();
+  checkCollision();
 }
 
 function spawnTarget(){
   if(targets.length>=Math.ceil(goal/2)) return;
-
   const t=document.createElement("div");
   t.className="target";
-
-  const tx=Math.random()*(innerWidth-40);
-  const ty=Math.random()*(innerHeight-40);
-
-  t.style.left=tx+"px";
-  t.style.top=ty+"px";
-  t.dataset.x=tx;
-  t.dataset.y=ty;
-
+  t.style.left=Math.random()*(innerWidth-30)+"px";
+  t.style.top=Math.random()*(innerHeight-30)+"px";
   game.appendChild(t);
   targets.push(t);
 }
 
-function checkCollisions(){
-  targets=targets.filter(t=>{
-    const tx=+t.dataset.x;
-    const ty=+t.dataset.y;
-    const dist=Math.hypot(px-tx, py-ty);
+function checkCollision(){
+  const pr=player.getBoundingClientRect();
+  const pcx=pr.left+pr.width/2;
+  const pcy=pr.top+pr.height/2;
 
-    if(dist<30){
+  targets=targets.filter(t=>{
+    const tr=t.getBoundingClientRect();
+    const tcx=tr.left+tr.width/2;
+    const tcy=tr.top+tr.height/2;
+
+    if(Math.hypot(pcx-tcx,pcy-tcy)<25){
       t.remove();
       collected++;
       updateHUD();
-
       if(collected>=goal){
-        endGame();
+        active=false;
+        document.getElementById("win").classList.remove("hidden");
       }else{
         spawnTarget();
       }
@@ -217,21 +186,15 @@ function checkCollisions(){
 function startGame(){
   goal=+goalInput.value;
   collected=0;
-  active=true;
+  targets.forEach(t=>t.remove());
+  targets=[];
   hud.classList.remove("hidden");
   updateHUD();
   document.getElementById("start").classList.add("hidden");
-
+  active=true;
   for(let i=0;i<Math.ceil(goal/2);i++) spawnTarget();
 }
 
-function endGame(){
-  active=false;
-  hud.classList.add("hidden");
-  document.getElementById("win").classList.remove("hidden");
-}
-
-/* BUTTONS */
 document.querySelectorAll(".btn").forEach(b=>{
   const a=b.getAttribute("data");
   ["touchstart","mousedown"].forEach(ev=>{
@@ -245,32 +208,6 @@ document.querySelectorAll(".btn").forEach(b=>{
       if(a=="forward")move(40,0);
     });
   });
-});
-
-/* LAYOUT */
-function toggleLayout(){
-  near=!near;
-  controls.style.justifyContent=near?"center":"space-between";
-  event.target.textContent=near?"Uzaklaş":"Yakınlaş";
-}
-
-/* JOYSTICK */
-function toggleJoy(){
-  joy=!joy;
-  joyZone.style.display=joy?"block":"none";
-  controls.style.display=joy?"none":"flex";
-}
-
-let sx=0, sy=0;
-joyZone.addEventListener("touchstart",e=>{
-  sx=e.touches[0].clientX;
-  sy=e.touches[0].clientY;
-});
-joyZone.addEventListener("touchmove",e=>{
-  if(!active)return;
-  const dx=e.touches[0].clientX-sx;
-  const dy=e.touches[0].clientY-sy;
-  move(dx*0.1,dy*0.1);
 });
 </script>
 
