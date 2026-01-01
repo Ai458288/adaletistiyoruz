@@ -2,233 +2,307 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-<title>Oyun</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Umut İçin Adalet - Oyun</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;user-select:none}
+*{
+  box-sizing:border-box;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
 body{
-  background:radial-gradient(circle at top,#020617,#000);
+  margin:0;
   overflow:hidden;
+  background:#020617;
+  font-family:system-ui;
   touch-action:none;
-  color:#fff;
-  font-family:Arial;
 }
 
-/* üst bilgi */
-#hud{
-  position:fixed;
-  top:10px;
-  left:10px;
-  z-index:20;
-  font-size:18px;
+#game{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
 }
 
-/* AI tuşu */
-#aiBtn{
-  position:fixed;
-  top:10px;
-  right:10px;
-  z-index:30;
-  padding:8px 12px;
-  border-radius:12px;
-  border:none;
-  background:rgba(255,255,255,.12);
-  color:#fff;
-}
-#aiBtn.active{
-  background:linear-gradient(90deg,#22c55e,#16a34a);
-}
-
-/* oyuncu */
+/* PLAYER */
 #player{
+  position:absolute;
   width:40px;
   height:40px;
   border-radius:50%;
   background:#22c55e;
-  position:absolute;
+  z-index:10;
 }
 
-/* hedef */
+/* TARGET */
 .target{
-  width:30px;
-  height:30px;
+  position:absolute;
+  width:28px;
+  height:28px;
   border-radius:50%;
   background:#ef4444;
-  position:absolute;
+  z-index:9;
 }
 
-/* kontroller */
+/* UI */
+#ui{
+  position:fixed;
+  top:10px;
+  left:10px;
+  color:#fff;
+  z-index:30;
+  font-size:16px;
+}
+
+/* CONTROLS */
 .controls{
   position:fixed;
-  bottom:15px;
+  bottom:16px;
+  left:0;
   width:100%;
   display:flex;
   justify-content:space-between;
-  padding:0 20px;
-  z-index:20;
+  padding:0 16px;
+  z-index:30;
+  pointer-events:auto;
 }
-.group{
-  display:flex;
-  flex-direction:column;
+
+/* PADS */
+.pad{
+  display:grid;
   gap:10px;
 }
-.btn{
-  width:60px;
-  height:60px;
-  border-radius:16px;
-  background:rgba(255,255,255,.15);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:24px;
+
+/* SOL ALT – YUKARI / AŞAĞI */
+.left-pad{
+  grid-template-columns:60px;
+  grid-template-rows:60px 60px;
 }
 
-/* başlangıç */
-#start{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:50;
+/* SAĞ ALT – SAĞ / SOL */
+.right-pad{
+  grid-template-columns:60px 60px;
+  grid-template-rows:60px;
 }
-#start button{
-  margin-top:20px;
-  padding:12px 25px;
-  border:none;
+
+/* BUTTON */
+.key{
+  background:rgba(255,255,255,.08); /* ŞEFFAF */
   border-radius:14px;
-  font-size:18px;
-}
-
-/* bitiş */
-#end{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:none;
+  display:flex;
   align-items:center;
   justify-content:center;
-  z-index:60;
+  font-size:26px;
+  color:#fff;
+  touch-action:none;
 }
-#endBox{
-  border:4px solid red;
-  padding:20px;
-  animation:rgb 2s linear infinite;
+
+.key:active{
+  background:rgba(255,255,255,.2);
 }
-@keyframes rgb{
-  0%{box-shadow:0 0 10px red}
-  50%{box-shadow:0 0 25px red}
-  100%{box-shadow:0 0 10px red}
+
+/* JOYSTICK */
+#joyArea{
+  position:fixed;
+  bottom:120px;
+  left:50%;
+  transform:translateX(-50%);
+  width:160px;
+  height:160px;
+  background:rgba(255,0,0,.12);
+  border-radius:50%;
+  display:none;
+  z-index:25;
+}
+
+#joy{
+  position:absolute;
+  width:50px;
+  height:50px;
+  background:#ef4444;
+  border-radius:50%;
+  top:55px;
+  left:55px;
+}
+
+/* OVERLAY */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#fff;
+}
+
+.box{
+  background:#0f172a;
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 0 40px rgba(255,0,0,.6);
+}
+
+/* BUTTON */
+.btn{
+  margin-top:14px;
+  padding:10px 20px;
+  border-radius:14px;
+  background:linear-gradient(90deg,#ff0000,#ff4d4d,#ff0000);
+  border:none;
+  color:#fff;
+  font-size:16px;
 }
 </style>
 </head>
 
 <body>
-
-<div id="hud">🎯 Kalan: <span id="left">0</span></div>
-<button id="aiBtn">🤖 AI</button>
+<div id="game">
 
 <div id="player"></div>
 
-<div class="controls" id="controls">
-  <div class="group">
-    <div class="btn" data-x="-1">⬆</div>
-    <div class="btn" data-x="-1">⬇</div>
+<div id="ui">🎯 Kalan: <span id="left">0</span></div>
+
+<div class="controls">
+  <!-- SOL ALT -->
+  <div class="pad left-pad">
+    <div class="key" data-dy="-1">⬆️</div>
+    <div class="key" data-dy="1">⬇️</div>
   </div>
-  <div class="group" style="flex-direction:row">
-    <div class="btn" data-y="-1">⬅</div>
-    <div class="btn" data-y="1">➡</div>
+
+  <!-- SAĞ ALT -->
+  <div class="pad right-pad">
+    <div class="key" data-dx="-1">⬅️</div>
+    <div class="key" data-dx="1">➡️</div>
   </div>
 </div>
 
-<div id="start">
-  <h2>Hedef Sayısı</h2>
-  <input id="count" type="number" value="5" min="1" style="padding:10px">
-  <button onclick="startGame()">Başla</button>
+<div id="joyArea">
+  <div id="joy"></div>
 </div>
 
-<div id="end">
-  <div id="endBox">
-    <img src="win.gif" width="200"><br><br>
-    <h2 style="color:cyan">Tebrikler! Kazandın</h2><br>
-    <button onclick="location.reload()">Tekrar Başla</button>
+<!-- START -->
+<div class="overlay" id="start">
+  <div class="box">
+    <h2>🎮 Oyun Başlasın</h2>
+    <p>Kaç hedef?</p>
+    <input id="count" type="number" value="1" min="1">
+    <br>
+    <button class="btn" onclick="start()">Başla</button>
   </div>
+</div>
+
+<!-- WIN -->
+<div class="overlay" id="win" style="display:none">
+  <div class="box">
+    <div style="padding:6px;border-radius:18px;
+      background:linear-gradient(90deg,#ff0000,#ff4d4d,#ff0000);
+      animation:rgb 2s linear infinite;">
+      <img src="SENIN_GIF.gif"
+        style="width:220px;height:220px;object-fit:cover;border-radius:12px">
+    </div>
+    <h2 style="margin-top:12px;color:#ff4d4d">🎉 Tebrikler! Kazandın</h2>
+    <button class="btn" onclick="location.reload()">Tekrar Başla</button>
+  </div>
+</div>
+
 </div>
 
 <script>
-let px=100,py=100,sx=0,sy=0;
-let targets=[],need=0;
-let ai=false;
-
+const game=document.getElementById("game");
 const player=document.getElementById("player");
-const leftTxt=document.getElementById("left");
-const controls=document.getElementById("controls");
+const leftEl=document.getElementById("left");
+
+let px=innerWidth/2, py=innerHeight/2;
+let speedX=0, speedY=0;
+let targets=[];
+let total=0;
+
+function start(){
+  document.getElementById("start").style.display="none";
+  total=parseInt(document.getElementById("count").value);
+  leftEl.textContent=total;
+  spawnBatch();
+  requestAnimationFrame(loop);
+}
 
 function spawn(){
   const t=document.createElement("div");
   t.className="target";
-  t.x=Math.random()*(innerWidth-40);
-  t.y=Math.random()*(innerHeight-40);
+
+  const topSafe=60;
+  const bottomSafe=160;
+  const sideSafe=20;
+
+  t.x=sideSafe+Math.random()*(innerWidth-30-sideSafe*2);
+  t.y=topSafe+Math.random()*(innerHeight-30-topSafe-bottomSafe);
+
   t.style.left=t.x+"px";
   t.style.top=t.y+"px";
-  document.body.appendChild(t);
+
+  game.appendChild(t);
   targets.push(t);
 }
 
-function startGame(){
-  need=+count.value;
-  leftTxt.textContent=need;
-  document.getElementById("start").style.display="none";
-  spawn();
+function spawnBatch(){
+  while(targets.length<Math.min(3,total)){
+    spawn();
+  }
 }
 
-document.querySelectorAll(".btn").forEach(b=>{
-  b.ontouchstart=()=>{
-    sx=b.dataset.y?b.dataset.y*2:0;
-    sy=b.dataset.x?b.dataset.x*2:0;
-  }
-  b.ontouchend=()=>{sx=sy=0}
-});
-
-aiBtn.onclick=()=>{
-  ai=!ai;
-  aiBtn.classList.toggle("active");
-  controls.style.display=ai?"none":"flex";
-};
-
 function loop(){
-  if(ai && targets[0]){
-    const t=targets[0];
-    sx=Math.sign(t.x-px)*2;
-    sy=Math.sign(t.y-py)*2;
-  }
+  px+=speedX;
+  py+=speedY;
 
-  px+=sx; py+=sy;
+  px=Math.max(0,Math.min(innerWidth-40,px));
+  py=Math.max(0,Math.min(innerHeight-40-140,py));
+
   player.style.left=px+"px";
   player.style.top=py+"px";
 
   targets.forEach((t,i)=>{
-    if(Math.hypot(px-t.x,py-t.y)<30){
+    if(Math.abs(px-t.x)<35 && Math.abs(py-t.y)<35){
       t.remove();
       targets.splice(i,1);
-      need--;
-      leftTxt.textContent=need;
-      if(need>0) spawn();
-      else document.getElementById("end").style.display="flex";
+      total--;
+      leftEl.textContent=total;
+      spawnBatch();
+      if(total<=0){
+        document.getElementById("win").style.display="flex";
+      }
     }
   });
 
   requestAnimationFrame(loop);
 }
-loop();
 
+/* BUTTONS */
+document.querySelectorAll(".key").forEach(k=>{
+  k.addEventListener("touchstart",e=>{
+    e.preventDefault();
+    speedX=(k.dataset.dx||0)*4;
+    speedY=(k.dataset.dy||0)*4;
+  });
+  k.addEventListener("touchend",()=>{
+    speedX=speedY=0;
+  });
+});
+
+/* BACKGROUND RESET */
 document.addEventListener("visibilitychange",()=>{
-  if(document.hidden) location.reload();
+  if(document.hidden){
+    sessionStorage.setItem("reload","1");
+  }else if(sessionStorage.getItem("reload")){
+    sessionStorage.removeItem("reload");
+    location.reload();
+  }
 });
 </script>
-
 </body>
 </html>
