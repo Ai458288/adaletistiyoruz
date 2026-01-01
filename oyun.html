@@ -6,129 +6,230 @@
 <title>Umut İçin Adalet - Oyun</title>
 
 <style>
+*{
+  box-sizing:border-box;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
 html,body{
   margin:0;
   padding:0;
-  background:black;
   overflow:hidden;
+  background:#020617;
+  font-family:system-ui;
   touch-action:none;
-  user-select:none;
-  font-family:Arial;
 }
 
-/* KARARMA */
-#overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.92);
-  z-index:50;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  color:white;
-}
-
-/* GAME */
 #game{
   position:relative;
   width:100vw;
   height:100vh;
-  background:radial-gradient(circle,#111,#000);
+  background:radial-gradient(circle,#111,#020617);
 }
 
+/* PLAYER */
 #player{
   position:absolute;
-  width:26px;
-  height:26px;
+  width:40px;
+  height:40px;
   border-radius:50%;
-  background:#ff4444;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
+  background:#22c55e;
+  z-index:10;
 }
 
+/* TARGET */
 .target{
   position:absolute;
-  width:20px;
-  height:20px;
+  width:28px;
+  height:28px;
   border-radius:50%;
-  background:#00ff88;
+  background:#ef4444;
+  z-index:9;
 }
 
 /* HUD */
 #hud{
   position:fixed;
   top:10px;
-  right:10px;
-  color:#0f0;
-  z-index:10;
+  left:10px;
+  color:#fff;
+  z-index:20;
+  font-weight:600;
+}
+
+/* OVERLAY */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#fff;
+}
+
+.box{
+  background:#0f172a;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 0 40px rgba(168,85,247,.6);
+}
+
+/* RGB */
+.rgb{
+  padding:6px;
+  border-radius:18px;
+  background:linear-gradient(90deg,#a855f7,#ec4899,#22c55e,#a855f7);
+  background-size:300% 300%;
+  animation:rgb 4s linear infinite;
+}
+@keyframes rgb{
+  0%{background-position:0%}
+  100%{background-position:100%}
 }
 
 /* BUTTON */
 .btn{
-  position:fixed;
-  background:rgba(255,255,255,0.15);
-  border:1px solid rgba(255,255,255,0.4);
-  color:white;
-  padding:14px;
+  margin-top:12px;
+  padding:10px 18px;
   border-radius:12px;
-  font-size:18px;
+  background:linear-gradient(90deg,#a855f7,#ec4899,#22c55e);
+  border:none;
+  color:#fff;
+  font-size:16px;
 }
 
-/* SOL ALT */
-#up{left:20px;bottom:110px}
-#down{left:20px;bottom:40px}
+/* CONTROLS */
+.controls{
+  position:fixed;
+  bottom:15px;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:0 15px;
+  z-index:20;
+}
 
-/* SAĞ ALT */
-#left{right:110px;bottom:60px}
-#right{right:20px;bottom:60px}
+.pad{
+  display:grid;
+  grid-template-columns:50px;
+  grid-template-rows:50px 50px;
+  gap:10px;
+}
+
+.pad.right{
+  grid-template-columns:50px 50px;
+  grid-template-rows:50px;
+}
+
+.key{
+  background:rgba(255,255,255,.15);
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+}
+.key:active{background:rgba(255,255,255,.3);}
+
+/* JOYSTICK */
+#joyArea{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  width:160px;
+  height:160px;
+  background:rgba(255,0,0,.15);
+  border-radius:50%;
+  display:none;
+  z-index:20;
+}
+#joy{
+  position:absolute;
+  width:50px;
+  height:50px;
+  background:#ef4444;
+  border-radius:50%;
+  top:55px;
+  left:55px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- BAŞLANGIÇ -->
-<div id="overlay">
-  <h2>Kaç hedef?</h2>
-  <input id="count" type="number" value="10" min="1" style="font-size:20px;width:80px;text-align:center">
-  <br><br>
-  <button onclick="startGame()" style="font-size:20px">Başla</button>
+<!-- START -->
+<div class="overlay" id="start">
+  <div class="rgb">
+    <div class="box">
+      <h2>🎮 Oyun Başlasın</h2>
+      <p>Kaç hedef?</p>
+      <input id="count" type="number" value="10" min="1"><br><br>
+      <label>
+        <input type="checkbox" id="useJoy"> Joystick ile oyna
+      </label><br>
+      <button class="btn" onclick="startGame()">Başla</button>
+    </div>
+  </div>
 </div>
+
+<!-- WIN -->
+<div class="overlay" id="win" style="display:none">
+  <div class="rgb">
+    <div class="box" id="winBox"></div>
+  </div>
+</div>
+
+<div id="hud">🎯 Kalan Hedef: <span id="left">0</span></div>
 
 <div id="game">
   <div id="player"></div>
 </div>
 
-<div id="hud">Hedef: <span id="leftCount">0</span></div>
+<!-- BUTTON CONTROLS -->
+<div class="controls" id="buttons">
+  <div class="pad">
+    <div class="key" id="up">⬆️</div>
+    <div class="key" id="down">⬇️</div>
+  </div>
+  <div class="pad right">
+    <div class="key" id="leftBtn">⬅️</div>
+    <div class="key" id="rightBtn">➡️</div>
+  </div>
+</div>
 
-<div id="up" class="btn">⬆</div>
-<div id="down" class="btn">⬇</div>
-<div id="left" class="btn">⬅</div>
-<div id="right" class="btn">➡</div>
+<div id="joyArea">
+  <div id="joy"></div>
+</div>
 
 <script>
 const player=document.getElementById("player");
-const game=document.getElementById("game");
-const overlay=document.getElementById("overlay");
-const hud=document.getElementById("leftCount");
+const leftEl=document.getElementById("left");
+const joyArea=document.getElementById("joyArea");
+const joy=document.getElementById("joy");
 
 let px=innerWidth/2, py=innerHeight/2;
 let speed=Math.max(innerWidth,innerHeight)/200;
 let move={up:false,down:false,left:false,right:false};
-
 let targets=[];
 let total=0, collected=0;
+let useJoy=false;
 
-/* INPUT */
+const WIN_MEDIA="WIN_MEDIA.gif"; // .gif veya .mp4
+
 function bind(id,key){
   const b=document.getElementById(id);
   b.ontouchstart=e=>{e.preventDefault();move[key]=true};
   b.ontouchend=()=>move[key]=false;
 }
-bind("up","up");bind("down","down");bind("left","left");bind("right","right");
+bind("up","up");bind("down","down");
+bind("leftBtn","left");bind("rightBtn","right");
 
-/* GAME */
 function spawn(){
   const t=document.createElement("div");
   t.className="target";
@@ -136,7 +237,7 @@ function spawn(){
   t.y=Math.random()*(innerHeight-30);
   t.style.left=t.x+"px";
   t.style.top=t.y+"px";
-  game.appendChild(t);
+  document.getElementById("game").appendChild(t);
   targets.push(t);
 }
 
@@ -146,10 +247,10 @@ function ensure(){
 
 function collision(){
   targets=targets.filter(t=>{
-    if(Math.hypot(px-t.x,py-t.y)<22){
-      game.removeChild(t);
+    if(Math.hypot(px-t.x,py-t.y)<28){
+      t.remove();
       collected++;
-      hud.textContent=total-collected;
+      leftEl.textContent=total-collected;
       return false;
     }
     return true;
@@ -158,17 +259,24 @@ function collision(){
 }
 
 function finish(){
-  overlay.style.display="flex";
-  overlay.innerHTML="<h1>Tebrikler!</h1><p>Oyun Bitti</p><button onclick='location.reload()'>Tekrar Başla</button>";
+  const box=document.getElementById("winBox");
+  box.innerHTML = WIN_MEDIA.endsWith(".gif")
+    ? `<img src="${WIN_MEDIA}" style="width:200px;border-radius:12px"><h2>Tebrikler!</h2>`
+    : `<video src="${WIN_MEDIA}" autoplay loop muted style="width:200px;border-radius:12px"></video><h2>Tebrikler!</h2>`;
+  box.innerHTML+=`<button class="btn" onclick="location.reload()">Tekrar Başla</button>`;
+  document.getElementById("win").style.display="flex";
 }
 
-/* LOOP */
 function loop(){
-  if(move.up)py-=speed;
-  if(move.down)py+=speed;
-  if(move.left)px-=speed;
-  if(move.right)px+=speed;
+  if(!useJoy){
+    if(move.up)py-=speed;
+    if(move.down)py+=speed;
+    if(move.left)px-=speed;
+    if(move.right)px+=speed;
+  }
 
+  px=Math.max(0,Math.min(innerWidth-40,px));
+  py=Math.max(0,Math.min(innerHeight-40,py));
   player.style.left=px+"px";
   player.style.top=py+"px";
 
@@ -176,14 +284,30 @@ function loop(){
   requestAnimationFrame(loop);
 }
 
+/* JOYSTICK */
+joyArea.addEventListener("touchmove",e=>{
+  const r=joyArea.getBoundingClientRect();
+  const t=e.touches[0];
+  const dx=t.clientX-(r.left+r.width/2);
+  const dy=t.clientY-(r.top+r.height/2);
+  px+=dx/15; py+=dy/15;
+});
+joyArea.addEventListener("touchend",()=>{});
+
 function startGame(){
   total=parseInt(document.getElementById("count").value);
   collected=0;
-  hud.textContent=total;
-  overlay.style.display="none";
+  leftEl.textContent=total;
+  useJoy=document.getElementById("useJoy").checked;
+  document.getElementById("start").style.display="none";
+  if(useJoy){
+    document.getElementById("buttons").style.display="none";
+    joyArea.style.display="block";
+  }
   ensure();
   loop();
 }
 </script>
+
 </body>
 </html>
