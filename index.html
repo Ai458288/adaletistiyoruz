@@ -248,6 +248,12 @@ function closeVideo(){
   overlay.style.display="none";
   bgm.play().catch(()=>{});
 }
+  
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) {
+    location.reload();
+  }
+});
 </script>
 
 </body>
