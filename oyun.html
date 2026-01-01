@@ -9,13 +9,27 @@
 html,body{
   margin:0;
   padding:0;
-  background:#000;
+  background:black;
   overflow:hidden;
   touch-action:none;
   user-select:none;
   font-family:Arial;
 }
 
+/* KARARMA */
+#overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.92);
+  z-index:50;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:white;
+}
+
+/* GAME */
 #game{
   position:relative;
   width:100vw;
@@ -23,24 +37,21 @@ html,body{
   background:radial-gradient(circle,#111,#000);
 }
 
-/* PLAYER */
 #player{
   position:absolute;
-  width:28px;
-  height:28px;
+  width:26px;
+  height:26px;
   border-radius:50%;
   background:#ff4444;
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
-  z-index:5;
 }
 
-/* TARGET */
 .target{
   position:absolute;
-  width:22px;
-  height:22px;
+  width:20px;
+  height:20px;
   border-radius:50%;
   background:#00ff88;
 }
@@ -51,14 +62,13 @@ html,body{
   top:10px;
   right:10px;
   color:#0f0;
-  font-size:14px;
   z-index:10;
 }
 
-/* BUTTON BASE */
+/* BUTTON */
 .btn{
   position:fixed;
-  background:rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.15);
   border:1px solid rgba(255,255,255,0.4);
   color:white;
   padding:14px;
@@ -66,191 +76,114 @@ html,body{
   font-size:18px;
 }
 
-/* SOL ALT – İLERİ GERİ */
-#forward{ left:20px; bottom:110px; }
-#back{ left:20px; bottom:40px; }
+/* SOL ALT */
+#up{left:20px;bottom:110px}
+#down{left:20px;bottom:40px}
 
-/* SAĞ ALT – SAĞ SOL */
-#left{ right:110px; bottom:60px; }
-#right{ right:20px; bottom:60px; }
-
-/* SOL ÜST */
-#zoomBtn{
-  left:20px;
-  top:20px;
-  background:rgba(255,0,0,0.7);
-}
-
-#joystickBtn{
-  left:20px;
-  top:70px;
-  background:rgba(255,255,255,0.15);
-}
-
-/* JOYSTICK */
-#joystickArea{
-  display:none;
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  height:35%;
-  background:rgba(255,0,0,0.12);
-}
-
-#stick{
-  position:absolute;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.35);
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-}
+/* SAĞ ALT */
+#left{right:110px;bottom:60px}
+#right{right:20px;bottom:60px}
 </style>
 </head>
 
 <body>
+
+<!-- BAŞLANGIÇ -->
+<div id="overlay">
+  <h2>Kaç hedef?</h2>
+  <input id="count" type="number" value="10" min="1" style="font-size:20px;width:80px;text-align:center">
+  <br><br>
+  <button onclick="startGame()" style="font-size:20px">Başla</button>
+</div>
+
 <div id="game">
   <div id="player"></div>
 </div>
 
 <div id="hud">Hedef: <span id="leftCount">0</span></div>
 
-<!-- TUŞLAR -->
-<div id="forward" class="btn">⬆</div>
-<div id="back" class="btn">⬇</div>
+<div id="up" class="btn">⬆</div>
+<div id="down" class="btn">⬇</div>
 <div id="left" class="btn">⬅</div>
 <div id="right" class="btn">➡</div>
 
-<div id="zoomBtn" class="btn">Yakınlaş</div>
-<div id="joystickBtn" class="btn">Joystick</div>
-
-<div id="joystickArea">
-  <div id="stick"></div>
-</div>
-
 <script>
-/* ==== GAME STATE ==== */
 const player=document.getElementById("player");
 const game=document.getElementById("game");
+const overlay=document.getElementById("overlay");
 const hud=document.getElementById("leftCount");
 
-let px=window.innerWidth/2;
-let py=window.innerHeight/2;
-let speed=3;
-
+let px=innerWidth/2, py=innerHeight/2;
+let speed=Math.max(innerWidth,innerHeight)/200;
 let move={up:false,down:false,left:false,right:false};
 
 let targets=[];
-let totalTarget=10;
-let collected=0;
+let total=0, collected=0;
 
-/* ==== TARGET ==== */
-function spawnTarget(){
+/* INPUT */
+function bind(id,key){
+  const b=document.getElementById(id);
+  b.ontouchstart=e=>{e.preventDefault();move[key]=true};
+  b.ontouchend=()=>move[key]=false;
+}
+bind("up","up");bind("down","down");bind("left","left");bind("right","right");
+
+/* GAME */
+function spawn(){
   const t=document.createElement("div");
   t.className="target";
-  t.x=Math.random()*(window.innerWidth-30);
-  t.y=Math.random()*(window.innerHeight-30);
+  t.x=Math.random()*(innerWidth-30);
+  t.y=Math.random()*(innerHeight-30);
   t.style.left=t.x+"px";
   t.style.top=t.y+"px";
   game.appendChild(t);
   targets.push(t);
 }
 
-function ensureTargets(){
-  while(targets.length<5 && collected<totalTarget){
-    spawnTarget();
-  }
+function ensure(){
+  while(targets.length<5 && collected<total) spawn();
 }
 
-/* ==== COLLISION ==== */
-function checkCollision(){
+function collision(){
   targets=targets.filter(t=>{
-    const dx=px - t.x;
-    const dy=py - t.y;
-    if(Math.hypot(dx,dy)<25){
+    if(Math.hypot(px-t.x,py-t.y)<22){
       game.removeChild(t);
       collected++;
-      hud.textContent=totalTarget-collected;
+      hud.textContent=total-collected;
       return false;
     }
     return true;
   });
+  if(collected>=total) finish();
 }
 
-/* ==== INPUT ==== */
-function bind(btn,key){
-  btn.addEventListener("touchstart",e=>{e.preventDefault();move[key]=true});
-  btn.addEventListener("touchend",()=>move[key]=false);
+function finish(){
+  overlay.style.display="flex";
+  overlay.innerHTML="<h1>Tebrikler!</h1><p>Oyun Bitti</p><button onclick='location.reload()'>Tekrar Başla</button>";
 }
 
-bind(forward,"up");
-bind(back,"down");
-bind(left,"left");
-bind(right,"right");
-
-/* ==== JOYSTICK ==== */
-const joyArea=document.getElementById("joystickArea");
-const stick=document.getElementById("stick");
-let joy=false;
-
-joyArea.addEventListener("touchstart",e=>joy=true);
-joyArea.addEventListener("touchend",()=>{
-  joy=false;
-  move={up:false,down:false,left:false,right:false};
-});
-
-joyArea.addEventListener("touchmove",e=>{
-  if(!joy)return;
-  const t=e.touches[0];
-  const r=joyArea.getBoundingClientRect();
-  const cx=r.width/2;
-  const cy=r.height/2;
-  const dx=t.clientX-cx;
-  const dy=t.clientY-(r.top+cy);
-
-  move.up=dy<-15;
-  move.down=dy>15;
-  move.left=dx<-15;
-  move.right=dx>15;
-});
-
-/* ==== BUTTON LOGIC ==== */
-joystickBtn.onclick=()=>{
-  const show=joyArea.style.display==="block";
-  joyArea.style.display=show?"none":"block";
-};
-
-zoomBtn.onclick=()=>{
-  speed = speed===3 ? 5 : 3;
-  zoomBtn.textContent = speed===5 ? "Uzaklaş" : "Yakınlaş";
-};
-
-/* ==== LOOP ==== */
+/* LOOP */
 function loop(){
-  if(move.up) py-=speed;
-  if(move.down) py+=speed;
-  if(move.left) px-=speed;
-  if(move.right) px+=speed;
-
-  px=Math.max(0,Math.min(px,window.innerWidth-28));
-  py=Math.max(0,Math.min(py,window.innerHeight-28));
+  if(move.up)py-=speed;
+  if(move.down)py+=speed;
+  if(move.left)px-=speed;
+  if(move.right)px+=speed;
 
   player.style.left=px+"px";
   player.style.top=py+"px";
 
-  ensureTargets();
-  checkCollision();
-
+  ensure(); collision();
   requestAnimationFrame(loop);
 }
 
-/* START */
-hud.textContent=totalTarget;
-ensureTargets();
-loop();
+function startGame(){
+  total=parseInt(document.getElementById("count").value);
+  collected=0;
+  hud.textContent=total;
+  overlay.style.display="none";
+  ensure();
+  loop();
+}
 </script>
 </body>
 </html>
