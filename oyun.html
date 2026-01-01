@@ -48,9 +48,90 @@ body{
   z-index:9;
 }
 
+/* UI */
+#ui{
+  position:fixed;
+  top:10px;
+  left:10px;
+  color:#fff;
+  z-index:30;
+  font-size:16px;
+}
+
+/* CONTROLS */
+.controls{
+  position:fixed;
+  bottom:16px;
+  left:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:0 16px;
+  z-index:30;
+  pointer-events:auto;
+}
+
+/* PADS */
+.pad{
+  display:grid;
+  gap:10px;
+}
+
+/* SOL ALT – YUKARI / AŞAĞI */
+.left-pad{
+  grid-template-columns:60px;
+  grid-template-rows:60px 60px;
+}
+
+/* SAĞ ALT – SAĞ / SOL */
+.right-pad{
+  grid-template-columns:60px 60px;
+  grid-template-rows:60px;
+}
+
+/* BUTTON */
+.key{
+  background:rgba(255,255,255,.08); /* ŞEFFAF */
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  color:#fff;
+  touch-action:none;
+}
+
+.key:active{
+  background:rgba(255,255,255,.2);
+}
+
+/* JOYSTICK */
+#joyArea{
+  position:fixed;
+  bottom:120px;
+  left:50%;
+  transform:translateX(-50%);
+  width:160px;
+  height:160px;
+  background:rgba(255,0,0,.12);
+  border-radius:50%;
+  display:none;
+  z-index:25;
+}
+
+#joy{
+  position:absolute;
+  width:50px;
+  height:50px;
+  background:#ef4444;
+  border-radius:50%;
+  top:55px;
+  left:55px;
+}
+
 /* OVERLAY */
 .overlay{
-  position:absolute;
+  position:fixed;
   inset:0;
   background:rgba(0,0,0,.85);
   z-index:50;
@@ -64,117 +145,19 @@ body{
 .box{
   background:#0f172a;
   padding:25px;
-  border-radius:18px;
-  box-shadow:0 0 40px rgba(255,0,0,.4);
+  border-radius:20px;
+  box-shadow:0 0 40px rgba(255,0,0,.6);
 }
 
 /* BUTTON */
 .btn{
   margin-top:14px;
-  padding:10px 22px;
+  padding:10px 20px;
   border-radius:14px;
-  background:linear-gradient(90deg,#ff0000,#ff9900,#ff0066);
+  background:linear-gradient(90deg,#ff0000,#ff4d4d,#ff0000);
   border:none;
   color:#fff;
   font-size:16px;
-  font-weight:700;
-}
-
-/* UI */
-#ui{
-  position:absolute;
-  top:10px;
-  left:10px;
-  color:#fff;
-  z-index:20;
-  font-size:18px;
-}
-
-/* CONTROLS */
-.controls{
-  position:absolute;
-  bottom:15px;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  padding:0 20px;
-  z-index:20;
-}
-
-.pad{
-  display:grid;
-  grid-template-columns:50px 50px 50px;
-  grid-template-rows:50px 50px 50px;
-  gap:8px;
-}
-
-.key{
-  background:rgba(255,255,255,.15);
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-}
-
-.key:active{
-  background:rgba(255,255,255,.35);
-}
-
-/* JOYSTICK */
-#joyArea{
-  position:absolute;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  width:160px;
-  height:160px;
-  background:rgba(255,0,0,.18);
-  border-radius:50%;
-  display:none;
-  z-index:20;
-}
-
-#joy{
-  position:absolute;
-  width:50px;
-  height:50px;
-  background:#ef4444;
-  border-radius:50%;
-  top:55px;
-  left:55px;
-}
-
-/* WIN SCREEN */
-.win-rgb{
-  padding:10px;
-  border-radius:28px;
-  background:linear-gradient(90deg,#ff0000,#ff4d4d,#ff0066,#ff0000);
-  background-size:400% 400%;
-  animation:winrgb 3s linear infinite;
-}
-
-@keyframes winrgb{
-  0%{background-position:0%}
-  100%{background-position:100%}
-}
-
-.rgb-square{
-  padding:6px;
-  border-radius:16px;
-  background:linear-gradient(90deg,#ff0000,#ff9900,#ff0000);
-  background-size:300% 300%;
-  animation:winrgb 2s linear infinite;
-  display:inline-block;
-}
-
-.win-text{
-  margin-top:14px;
-  font-size:26px;
-  font-weight:900;
-  background:linear-gradient(90deg,#ff0000,#ffcc00,#ff0066);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
 }
 </style>
 </head>
@@ -186,17 +169,17 @@ body{
 
 <div id="ui">🎯 Kalan: <span id="left">0</span></div>
 
-<div class="controls" id="buttons">
-  <div class="pad">
-    <div></div>
+<div class="controls">
+  <!-- SOL ALT -->
+  <div class="pad left-pad">
     <div class="key" data-dy="-1">⬆️</div>
-    <div></div>
-    <div class="key" data-dx="-1">⬅️</div>
-    <div></div>
-    <div class="key" data-dx="1">➡️</div>
-    <div></div>
     <div class="key" data-dy="1">⬇️</div>
-    <div></div>
+  </div>
+
+  <!-- SAĞ ALT -->
+  <div class="pad right-pad">
+    <div class="key" data-dx="-1">⬅️</div>
+    <div class="key" data-dx="1">➡️</div>
   </div>
 </div>
 
@@ -209,7 +192,7 @@ body{
   <div class="box">
     <h2>🎮 Oyun Başlasın</h2>
     <p>Kaç hedef?</p>
-    <input id="count" type="number" value="5" min="1">
+    <input id="count" type="number" value="1" min="1">
     <br>
     <button class="btn" onclick="start()">Başla</button>
   </div>
@@ -217,29 +200,34 @@ body{
 
 <!-- WIN -->
 <div class="overlay" id="win" style="display:none">
-  <div id="winBox"></div>
+  <div class="box">
+    <div style="padding:6px;border-radius:18px;
+      background:linear-gradient(90deg,#ff0000,#ff4d4d,#ff0000);
+      animation:rgb 2s linear infinite;">
+      <img src="SENIN_GIF.gif"
+        style="width:220px;height:220px;object-fit:cover;border-radius:12px">
+    </div>
+    <h2 style="margin-top:12px;color:#ff4d4d">🎉 Tebrikler! Kazandın</h2>
+    <button class="btn" onclick="location.reload()">Tekrar Başla</button>
+  </div>
 </div>
 
 </div>
 
 <script>
-const WIN_MEDIA = "SENIN_GIF_YA_DA_VIDEO.gif";
-
 const game=document.getElementById("game");
 const player=document.getElementById("player");
 const leftEl=document.getElementById("left");
 
-let px=120,py=120;
-let speedX=0,speedY=0;
+let px=innerWidth/2, py=innerHeight/2;
+let speedX=0, speedY=0;
 let targets=[];
 let total=0;
-let running=false;
 
 function start(){
   document.getElementById("start").style.display="none";
   total=parseInt(document.getElementById("count").value);
   leftEl.textContent=total;
-  running=true;
   spawnBatch();
   requestAnimationFrame(loop);
 }
@@ -247,71 +235,57 @@ function start(){
 function spawn(){
   const t=document.createElement("div");
   t.className="target";
-  t.x=Math.random()*(innerWidth-30);
-  t.y=Math.random()*(innerHeight-30);
+
+  const topSafe=60;
+  const bottomSafe=160;
+  const sideSafe=20;
+
+  t.x=sideSafe+Math.random()*(innerWidth-30-sideSafe*2);
+  t.y=topSafe+Math.random()*(innerHeight-30-topSafe-bottomSafe);
+
   t.style.left=t.x+"px";
   t.style.top=t.y+"px";
+
   game.appendChild(t);
   targets.push(t);
 }
 
 function spawnBatch(){
-  while(targets.length < Math.min(3,total)){
+  while(targets.length<Math.min(3,total)){
     spawn();
   }
 }
 
 function loop(){
-  if(!running) return;
-
   px+=speedX;
   py+=speedY;
 
   px=Math.max(0,Math.min(innerWidth-40,px));
-  py=Math.max(0,Math.min(innerHeight-40,py));
+  py=Math.max(0,Math.min(innerHeight-40-140,py));
 
   player.style.left=px+"px";
   player.style.top=py+"px";
 
-  targets.slice().forEach((t,i)=>{
-    if(Math.abs(px-t.x)<30 && Math.abs(py-t.y)<30){
+  targets.forEach((t,i)=>{
+    if(Math.abs(px-t.x)<35 && Math.abs(py-t.y)<35){
       t.remove();
       targets.splice(i,1);
       total--;
       leftEl.textContent=total;
       spawnBatch();
-      if(total<=0) finish();
+      if(total<=0){
+        document.getElementById("win").style.display="flex";
+      }
     }
   });
 
   requestAnimationFrame(loop);
 }
 
-function finish(){
-  running=false;
-  const box=document.getElementById("winBox");
-
-  const media = WIN_MEDIA.endsWith(".gif")
-    ? `<img src="${WIN_MEDIA}" style="width:220px;height:220px;border-radius:12px">`
-    : `<video src="${WIN_MEDIA}" autoplay loop muted
-        style="width:220px;height:220px;border-radius:12px"></video>`;
-
-  box.innerHTML=`
-    <div class="win-rgb">
-      <div class="box">
-        <div class="rgb-square">${media}</div>
-        <div class="win-text">🎉 Tebrikler!<br>Kazandın</div>
-        <button class="btn" onclick="location.reload()">Tekrar Başla</button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById("win").style.display="flex";
-}
-
 /* BUTTONS */
 document.querySelectorAll(".key").forEach(k=>{
-  k.addEventListener("touchstart",()=>{
+  k.addEventListener("touchstart",e=>{
+    e.preventDefault();
     speedX=(k.dataset.dx||0)*4;
     speedY=(k.dataset.dy||0)*4;
   });
@@ -320,7 +294,7 @@ document.querySelectorAll(".key").forEach(k=>{
   });
 });
 
-/* VISIBILITY RESET */
+/* BACKGROUND RESET */
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden){
     sessionStorage.setItem("reload","1");
