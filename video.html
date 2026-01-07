@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Video Oynatıcı</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#000;
+  color:#fff;
+  font-family:Arial;
+  overflow:hidden;
+}
+
+/* BAŞLA */
+#start{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:70px;
+  cursor:pointer;
+  z-index:10;
+}
+
+/* PLAYER */
+#player{
+  display:none;
+  width:100vw;
+  height:100vh;
+  position:relative;
+}
+
+/* VIDEO */
+video{
+  width:100%;
+  height:100%;
+  background:#000;
+  object-fit:contain;
+}
+
+/* PROGRESS */
+#progress{
+  position:absolute;
+  bottom:80px;
+  width:100%;
+  height:6px;
+  background:#333;
+  cursor:pointer;
+}
+#bar{
+  height:100%;
+  width:0%;
+  background:#fff;
+}
+
+/* CONTROLS */
+.controls{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:80px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  background:rgba(0,0,0,.7);
+}
+button{
+  padding:10px 15px;
+  background:#222;
+  color:#fff;
+  border:1px solid #555;
+}
+input[type=range]{
+  width:120px;
+}
+
+/* EXIT FULLSCREEN */
+#exit{
+  position:absolute;
+  top:10px;
+  left:10px;
+  padding:8px 12px;
+  background:rgba(0,0,0,.7);
+  border:1px solid #555;
+  display:none;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="start">BAŞLA</div>
+
+<div id="player">
+  <div id="exit" onclick="exitFullscreen()">Çık</div>
+
+  <video id="video"></video>
+
+  <div id="progress">
+    <div id="bar"></div>
+  </div>
+
+  <div class="controls">
+    <button onclick="prev()">Önceki</button>
+    <button onclick="replay()">Tekrar</button>
+    <button onclick="next()">Devam Et</button>
+    <button onclick="enterFullscreen()">Tam Ekran</button>
+    <input type="range" min="0" max="1" step="0.01" onchange="setVolume(this.value)">
+  </div>
+</div>
+
+<script>
+// 🔥 BURAYA VİDEOLARINI EKLE
+const videos = [
+  "video1.mp4",
+  "video2.mp4",
+  "video3.mp4"
+];
+
+let index = 0;
+const video = document.getElementById("video");
+const bar = document.getElementById("bar");
+const exitBtn = document.getElementById("exit");
+
+start.onclick = () => {
+  start.style.display = "none";
+  player.style.display = "block";
+  loadVideo();
+};
+
+function loadVideo(){
+  video.src = videos[index];
+  video.play();
+}
+
+function next(){
+  if(index < videos.length - 1){
+    index++;
+    loadVideo();
+  }
+}
+
+function prev(){
+  if(index > 0){
+    index--;
+    loadVideo();
+  }
+}
+
+function replay(){
+  video.currentTime = 0;
+  video.play();
+}
+
+function setVolume(v){
+  video.volume = v;
+}
+
+/* PROGRESS BAR */
+video.ontimeupdate = () => {
+  bar.style.width = (video.currentTime / video.duration * 100) + "%";
+};
+
+progress.onclick = (e) => {
+  const percent = e.offsetX / progress.offsetWidth;
+  video.currentTime = percent * video.duration;
+};
+
+/* FULLSCREEN */
+function enterFullscreen(){
+  if(player.requestFullscreen) player.requestFullscreen();
+  exitBtn.style.display = "block";
+}
+
+function exitFullscreen(){
+  if(document.exitFullscreen) document.exitFullscreen();
+  exitBtn.style.display = "none";
+}
+</script>
+
+</body>
+  </html>
