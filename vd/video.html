@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Video</title>
+<title>Drive Video Oynatıcı</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -104,8 +103,8 @@ input[type=range]{width:120px}
 <div id="player">
   <div id="exit">Çık</div>
 
-  <!-- TEK VİDEO -->
-  <video id="video" src="video.mp4"></video>
+  <!-- GOOGLE DRIVE VİDEO -->
+  <video id="video" src="https://drive.google.com/uc?export=download&id=1iWTjd2zeeWQu9CTJ3yiFL41wR3xnrm6O"></video>
 
   <div id="progress"><div id="bar"></div></div>
 
@@ -147,6 +146,7 @@ document.getElementById("playPause").onclick = () => {
 // SES
 document.getElementById("volume").oninput = e => {
   video.volume = e.target.value;
+  showControls();
 };
 
 // PROGRESS BAR
@@ -173,11 +173,10 @@ exitBtn.onclick = () => {
   showControls();
 };
 
-// 👆 DOKUNUNCA KONTROLLER
+// KONTROLLERİN OTOMATİK GİZLENMESİ
 player.addEventListener("mousemove", showControls);
 player.addEventListener("touchstart", showControls);
 
-// ⏱️ OTOMATİK GİZLE
 function showControls(){
   controls.classList.remove("hide");
   progress.classList.remove("hide");
@@ -190,14 +189,14 @@ function showControls(){
   }, 2500);
 }
 
-// 👆👆 ÇİFT TIK 10 SN İLERİ / GERİ
+// ÇİFT TIK = 10sn ileri/geri
 video.addEventListener("click", e => {
   const now = Date.now();
   if(now - lastTap < 300){
     const x = e.offsetX;
-    if(x < video.clientWidth / 2){
+    if(x < video.clientWidth/2){
       video.currentTime = Math.max(0, video.currentTime - 10);
-    }else{
+    } else {
       video.currentTime = Math.min(video.duration, video.currentTime + 10);
     }
   }
