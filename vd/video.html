@@ -1,13 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Video Oynatıcı</title>
+<title>Video</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;font-family:Arial;overflow:hidden}
 
+/* BAŞLA */
 #start{
   position:fixed;
   inset:0;
@@ -19,6 +21,7 @@ body{background:#000;color:#fff;font-family:Arial;overflow:hidden}
   z-index:10;
 }
 
+/* PLAYER */
 #player{
   display:none;
   width:100vw;
@@ -26,13 +29,15 @@ body{background:#000;color:#fff;font-family:Arial;overflow:hidden}
   position:relative;
 }
 
+/* VIDEO */
 video{
   width:100%;
   height:100%;
-  background:#000;
   object-fit:contain;
+  background:#000;
 }
 
+/* PROGRESS */
 #progress{
   position:absolute;
   bottom:80px;
@@ -40,6 +45,8 @@ video{
   height:6px;
   background:#333;
   cursor:pointer;
+  opacity:1;
+  transition:.3s;
 }
 #bar{
   height:100%;
@@ -47,6 +54,7 @@ video{
   background:#fff;
 }
 
+/* CONTROLS */
 .controls{
   position:absolute;
   bottom:0;
@@ -57,6 +65,13 @@ video{
   justify-content:center;
   gap:10px;
   background:rgba(0,0,0,.7);
+  opacity:1;
+  transition:.3s;
+}
+
+.hide{
+  opacity:0;
+  pointer-events:none;
 }
 
 button{
@@ -68,6 +83,7 @@ button{
 
 input[type=range]{width:120px}
 
+/* EXIT */
 #exit{
   position:absolute;
   top:10px;
@@ -75,8 +91,8 @@ input[type=range]{width:120px}
   padding:8px 12px;
   background:rgba(0,0,0,.7);
   border:1px solid #555;
-  display:none;
   cursor:pointer;
+  display:none;
 }
 </style>
 </head>
@@ -88,96 +104,105 @@ input[type=range]{width:120px}
 <div id="player">
   <div id="exit">Çık</div>
 
-  <video id="video"></video>
+  <!-- TEK VİDEO -->
+  <video id="video" src="video.mp4"></video>
 
   <div id="progress"><div id="bar"></div></div>
 
-  <div class="controls">
-    <button id="prevBtn">Önceki</button>
-    <button id="replayBtn">Tekrar</button>
-    <button id="nextBtn">Devam Et</button>
+  <div class="controls" id="controls">
+    <button id="playPause">Dur / Oynat</button>
     <button id="fullBtn">Tam Ekran</button>
     <input type="range" min="0" max="1" step="0.01" id="volume">
   </div>
 </div>
 
 <script>
-// 🔥 SENİN VİDEOLARIN (AYNEN)
-const videos = [
-  "Gitme sen. @bmwm.vip ........#fyp #viral #keşfet #keşfetedüş #reels #aşk #bmw #love #bmwloves #e.mp4",
-  "Screenrecorder-2026-01-07-21-15-26-841.mp4",
-  "get.mp4",
-  "BMW M5 E60🖤👑.mp4",
-  "Screenrecorder-2026-01-07-21-10-02-79.mp4"
-];
-
-let index = 0;
-
-// ELEMENTLER
 const start = document.getElementById("start");
 const player = document.getElementById("player");
 const video = document.getElementById("video");
 const bar = document.getElementById("bar");
 const progress = document.getElementById("progress");
+const controls = document.getElementById("controls");
 const exitBtn = document.getElementById("exit");
 
+let hideTimer;
+let lastTap = 0;
+
 // BAŞLA
-start.addEventListener("click", () => {
-  start.style.display = "none";
-  player.style.display = "block";
-  loadVideo();
-});
-
-function loadVideo(){
-  video.src = videos[index];
+start.onclick = () => {
+  start.style.display="none";
+  player.style.display="block";
+  video.playsInline = true;
   video.play();
-}
-
-// BUTONLAR
-document.getElementById("nextBtn").onclick = () => {
-  if(index < videos.length - 1){
-    index++;
-    loadVideo();
-  }
+  showControls();
 };
 
-document.getElementById("prevBtn").onclick = () => {
-  if(index > 0){
-    index--;
-    loadVideo();
-  }
+// PLAY / PAUSE
+document.getElementById("playPause").onclick = () => {
+  if(video.paused) video.play();
+  else video.pause();
+  showControls();
 };
 
-document.getElementById("replayBtn").onclick = () => {
-  video.currentTime = 0;
-  video.play();
-};
-
+// SES
 document.getElementById("volume").oninput = e => {
   video.volume = e.target.value;
 };
 
-// PROGRESS
+// PROGRESS BAR
 video.ontimeupdate = () => {
-  if(video.duration)
-    bar.style.width = (video.currentTime / video.duration * 100) + "%";
+  bar.style.width = (video.currentTime / video.duration * 100) + "%";
 };
 
 progress.onclick = e => {
   const p = e.offsetX / progress.offsetWidth;
   video.currentTime = p * video.duration;
+  showControls();
 };
 
-// FULLSCREEN
+// TAM EKRAN
 document.getElementById("fullBtn").onclick = () => {
   if(player.requestFullscreen) player.requestFullscreen();
-  exitBtn.style.display = "block";
+  exitBtn.style.display="block";
+  showControls();
 };
 
 exitBtn.onclick = () => {
   if(document.exitFullscreen) document.exitFullscreen();
-  exitBtn.style.display = "none";
+  exitBtn.style.display="none";
+  showControls();
 };
+
+// 👆 DOKUNUNCA KONTROLLER
+player.addEventListener("mousemove", showControls);
+player.addEventListener("touchstart", showControls);
+
+// ⏱️ OTOMATİK GİZLE
+function showControls(){
+  controls.classList.remove("hide");
+  progress.classList.remove("hide");
+  clearTimeout(hideTimer);
+  hideTimer = setTimeout(()=>{
+    if(!video.paused){
+      controls.classList.add("hide");
+      progress.classList.add("hide");
+    }
+  }, 2500);
+}
+
+// 👆👆 ÇİFT TIK 10 SN İLERİ / GERİ
+video.addEventListener("click", e => {
+  const now = Date.now();
+  if(now - lastTap < 300){
+    const x = e.offsetX;
+    if(x < video.clientWidth / 2){
+      video.currentTime = Math.max(0, video.currentTime - 10);
+    }else{
+      video.currentTime = Math.min(video.duration, video.currentTime + 10);
+    }
+  }
+  lastTap = now;
+});
 </script>
 
 </body>
